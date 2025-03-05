@@ -1,0 +1,1079 @@
+<specification_planning>
+
+# PromptNova Technical Specification Planning
+
+## 1. Core System Architecture and Key Workflows
+
+### Step-by-Step Breakdown
+
+1. **Electron Application Architecture**
+   - Main Process: Handles system-level operations (file system, shortcuts, clipboard)
+   - Renderer Process: Manages UI with React and Tailwind CSS
+   - IPC Communication: Facilitates data exchange between processes
+
+2. **Key Workflows**
+   - Prompt Management: CRUD operations for prompts with categorization
+   - Prompt Activation: Global shortcut → UI display → prompt selection → placeholder filling → insertion
+   - Context Code Integration: File/folder selection → processing → inclusion in prompts
+   - Workspace Switching: Selection mechanism between different prompt environments
+
+### Potential Challenges
+
+- **Performance Concerns**: Ensuring the floating window appears instantly when triggered
+- **Cross-Platform Compatibility**: Maintaining consistent behavior across Windows, macOS, and Linux
+- **Global Shortcut Conflicts**: Handling potential conflicts with other applications
+
+### Edge Cases
+
+- Application behavior when system clipboard is in use by another process
+- Handling very large prompts or context code inclusions
+- Recovery mechanisms for corrupted local storage
+
+## 2. Project Structure and Organization
+
+### Step-by-Step Breakdown
+
+1. **Directory Structure**
+   - `/src`: Source code
+     - `/main`: Electron main process
+     - `/renderer`: React application
+       - `/components`: UI components
+       - `/hooks`: Custom React hooks
+       - `/contexts`: React context providers
+       - `/utils`: Utility functions
+     - `/shared`: Code shared between main and renderer
+   - `/assets`: Static assets
+   - `/build`: Build configuration
+   - `/documentation`: User and developer documentation
+
+2. **Code Organization**
+   - Feature-based organization within components
+   - Clear separation between UI and business logic
+   - Consistent file naming and code style following Airbnb guidelines
+
+### Potential Challenges
+
+- Maintaining clear boundaries between main and renderer processes
+- Preventing code duplication across features
+- Ensuring proper type safety across the application
+
+## 3. Detailed Feature Specifications
+
+### Step-by-Step Breakdown for Each Feature
+
+1. **Prompt Management**
+   - Data structure for prompts (title, content, category, tags)
+   - CRUD operations with local storage persistence
+   - Category and tag management system
+   - Import/export functionality with format conversion
+
+2. **User Interface**
+   - Floating window implementation with Electron
+   - Search and filtering mechanisms
+   - Keyboard navigation system
+   - Shortcut management and configuration
+
+3. **Placeholder System**
+   - Regex-based placeholder detection
+   - UI for placeholder value input
+   - Preview rendering with placeholder substitution
+   - Placeholder value persistence options
+
+4. **Context Code Integration**
+   - File system access via Electron APIs
+   - Drag and drop implementation
+   - Code processing options (comment stripping, formatting)
+   - Size limitation and optimization strategies
+
+5. **Workspace Management**
+   - Data structure for workspaces
+   - Configuration persistence per workspace
+   - Workspace switching mechanism
+   - Import/export of workspace settings
+
+### Potential Challenges
+
+- Complex UI interactions for placeholder filling
+- Performance implications of large code file processing
+- Maintaining a clean, intuitive UI despite feature complexity
+
+## 4. Database Schema Design
+
+Since this is a desktop application using local storage rather than a traditional database, we'll focus on data structures:
+
+### Step-by-Step Breakdown
+
+1. **Data Models**
+   - Prompt: id, title, content, category, tags, created_at, updated_at
+   - Category: id, name, color, parent_id
+   - Tag: id, name, color
+   - Workspace: id, name, settings
+   - Settings: application-wide and workspace-specific settings
+
+2. **Storage Strategy**
+   - Electron's localStorage or IndexedDB for persistence
+   - File-based storage for import/export and backup
+   - Efficient indexing for quick search and retrieval
+
+### Potential Challenges
+
+- Ensuring data integrity across application restarts
+- Handling migrations when data structure changes
+- Efficient querying for large prompt collections
+
+## 5. Main Process and Renderer Process Communication
+
+### Step-by-Step Breakdown
+
+1. **IPC Channels**
+   - Define clear channels for different types of operations
+   - Implement request/response patterns for async operations
+   - Set up event-based communication for system events
+
+2. **File System Operations**
+   - Secure file access through main process
+   - Efficient file reading/writing for context code
+   - Import/export functionality implementation
+
+### Potential Challenges
+
+- Maintaining type safety across IPC boundaries
+- Handling errors in asynchronous operations
+- Ensuring security in file system operations
+
+## 6. Design System and Component Architecture
+
+### Step-by-Step Breakdown
+
+1. **Visual Style**
+   - Define color palette, typography, and spacing system
+   - Create consistent component styling patterns
+   - Implement responsive design principles
+
+2. **Core Components**
+   - Create a component library with common UI elements
+   - Define props interfaces and component behavior
+   - Implement interactive states and animations
+
+### Potential Challenges
+
+- Ensuring consistent styling across the application
+- Balancing aesthetics with performance
+- Maintaining accessibility standards
+
+## 7. Data Flow and State Management
+
+### Step-by-Step Breakdown
+
+1. **State Management**
+   - Use React Context for global state
+   - Implement custom hooks for feature-specific state
+   - Define clear update patterns for state changes
+
+2. **Data Persistence**
+   - Implement storage adapters for different data types
+   - Create migration strategies for data structure changes
+   - Set up automatic saving and backup mechanisms
+
+### Potential Challenges
+
+- Managing complex state across multiple features
+- Ensuring performance with frequent state updates
+- Handling concurrent modifications to the same data
+
+## 8. Testing Strategy
+
+### Step-by-Step Breakdown
+
+1. **Unit Testing**
+   - Test individual components and utilities
+   - Mock external dependencies and IPC calls
+   - Ensure high coverage of business logic
+
+2. **Integration Testing**
+   - Test feature workflows end-to-end
+   - Verify IPC communication
+   - Test file system operations
+
+3. **E2E Testing**
+   - Simulate user interactions with Playwright
+   - Test cross-platform compatibility
+   - Verify global shortcut functionality
+
+### Potential Challenges
+
+- Testing Electron-specific functionality
+- Simulating global shortcuts in test environment
+- Ensuring consistent test results across platforms
+
+## Areas Not Applicable to This Project
+
+Based on the project requirements, the following areas are not applicable:
+
+1. **Authentication & Authorization**: This is a local desktop application without user accounts
+2. **Server Actions**: This is not a client-server application
+3. **Stripe Integration**: No payment processing is required
+4. **PostHog Analytics**: No analytics implementation is mentioned in requirements
+
+However, we will include basic telemetry options (opt-in) for application improvement.
+</specification_planning>
+
+<technical_specification>
+# PromptNova Technical Specification
+
+## 1. System Overview
+
+### Core Purpose and Value Proposition
+
+PromptNova is a desktop application designed to centralize the storage and utilization of prompts for AI interactions and other command types. Its core value proposition includes:
+
+- **Efficiency**: Eliminates manual copying and pasting of frequently used prompts
+- **Organization**: Provides a structured system for categorizing and retrieving prompts
+- **Flexibility**: Supports placeholders for dynamic content insertion
+- **Integration**: Seamlessly works with any application through global shortcuts
+- **Context Awareness**: Allows inclusion of code files and folders as context
+
+The application serves as a productivity tool for AI power users, developers, content creators, and anyone who frequently uses repetitive text inputs across different applications.
+
+### Key Workflows
+
+#### 1. Prompt Management Workflow
+
+1. User creates a new prompt with title, content, and optional categorization
+2. System stores the prompt in local storage with metadata
+3. User can edit, categorize, tag, or delete prompts through the management interface
+4. User can import/export prompts in various formats (Markdown, JSON, XML)
+
+#### 2. Prompt Activation Workflow
+
+1. User triggers the application via global shortcut (e.g., Ctrl+Shift+Space)
+2. Floating window appears on top of the current application
+3. User navigates to desired prompt (via search, categories, or keyboard navigation)
+4. If prompt contains placeholders, user is prompted to fill them
+5. User confirms, and the final prompt is inserted at the cursor position in the target application
+
+#### 3. Context Code Integration Workflow
+
+1. User drags files/folders into prompt editor or uses file picker
+2. System processes files according to user preferences (full content vs. path, comment stripping, etc.)
+3. Code is formatted and included in the prompt with proper Markdown formatting
+4. User can adjust processing options and preview the result
+
+#### 4. Workspace Switching Workflow
+
+1. User selects workspace from dropdown or sidebar
+2. System loads workspace-specific prompts, categories, and settings
+3. UI updates to reflect the current workspace context
+4. User can manage workspaces (create, rename, delete) through settings
+
+### System Architecture
+
+#### High-Level Architecture
+
+PromptNova is built on Electron, providing a cross-platform desktop application with the following architecture:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Electron Application                  │
+│                                                         │
+│  ┌─────────────────┐           ┌─────────────────────┐  │
+│  │   Main Process  │◄─────────►│   Renderer Process  │  │
+│  │                 │    IPC    │                     │  │
+│  │ - System Access │           │ - React UI          │  │
+│  │ - File I/O      │           │ - User Interaction  │  │
+│  │ - Global        │           │ - State Management  │  │
+│  │   Shortcuts     │           │ - Rendering         │  │
+│  └─────────────────┘           └─────────────────────┘  │
+│                                                         │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │                Local Storage                     │    │
+│  │                                                 │    │
+│  │ - Prompts                  - Settings           │    │
+│  │ - Categories               - Workspaces         │    │
+│  │ - Tags                                          │    │
+│  └─────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### Component Architecture
+
+1. **Main Process Components**
+   - **ShortcutManager**: Registers and handles global shortcuts
+   - **FileSystemManager**: Handles file and folder operations
+   - **ClipboardManager**: Manages clipboard operations
+   - **WindowManager**: Controls application windows (main, floating)
+   - **IPCHandler**: Manages communication between processes
+
+2. **Renderer Process Components**
+   - **React Application**: UI implementation with Tailwind CSS
+   - **State Management**: React Context for global state
+   - **Component Library**: Reusable UI components
+   - **Service Layer**: Business logic and data operations
+
+3. **Data Layer**
+   - **StorageAdapter**: Interface for local storage operations
+   - **DataModels**: Structured data representations
+   - **MigrationManager**: Handles data structure changes
+
+## 2. Project Structure
+
+### Detailed Breakdown of Project Structure & Organization
+
+```
+promptnova/
+├── .github/                      # GitHub configuration
+│   └── workflows/                # CI/CD workflows
+├── .vscode/                      # VS Code configuration
+├── assets/                       # Static assets
+│   ├── icons/                    # Application icons
+│   └── images/                   # UI images
+├── build/                        # Build configuration
+│   ├── electron-builder.yml      # Electron builder config
+│   └── webpack.config.js         # Webpack configuration
+├── dist/                         # Build output
+├── documentation/                # Documentation
+│   ├── developer/                # Developer documentation
+│   └── user/                     # User documentation
+├── src/                          # Source code
+│   ├── main/                     # Electron main process
+│   │   ├── ipc/                  # IPC handlers
+│   │   │   ├── file-system.ts    # File system operations
+│   │   │   ├── clipboard.ts      # Clipboard operations
+│   │   │   └── shortcuts.ts      # Shortcut operations
+│   │   ├── managers/             # System managers
+│   │   │   ├── window-manager.ts # Window management
+│   │   │   ├── shortcut-manager.ts # Global shortcuts
+│   │   │   └── clipboard-manager.ts # Clipboard interactions
+│   │   ├── preload.ts            # Preload script
+│   │   └── main.ts               # Main entry point
+│   ├── renderer/                 # Electron renderer process
+│   │   ├── components/           # React components
+│   │   │   ├── common/           # Shared components
+│   │   │   │   ├── Button.tsx    # Button component
+│   │   │   │   ├── Input.tsx     # Input component
+│   │   │   │   └── ...           # Other common components
+│   │   │   ├── prompt-management/ # Prompt management components
+│   │   │   │   ├── PromptList.tsx # Prompt list component
+│   │   │   │   ├── PromptEditor.tsx # Prompt editor component
+│   │   │   │   └── ...           # Other prompt components
+│   │   │   ├── placeholder/      # Placeholder components
+│   │   │   │   ├── PlaceholderEditor.tsx # Placeholder editor
+│   │   │   │   └── ...           # Other placeholder components
+│   │   │   ├── context-code/     # Context code components
+│   │   │   │   ├── FileDropzone.tsx # File dropzone component
+│   │   │   │   └── ...           # Other context code components
+│   │   │   ├── workspace/        # Workspace components
+│   │   │   │   ├── WorkspaceSelector.tsx # Workspace selector
+│   │   │   │   └── ...           # Other workspace components
+│   │   │   └── layout/           # Layout components
+│   │   │       ├── MainLayout.tsx # Main application layout
+│   │   │       ├── FloatingWindow.tsx # Floating window layout
+│   │   │       └── ...           # Other layout components
+│   │   ├── contexts/             # React contexts
+│   │   │   ├── PromptContext.tsx # Prompt context provider
+│   │   │   ├── WorkspaceContext.tsx # Workspace context provider
+│   │   │   └── SettingsContext.tsx # Settings context provider
+│   │   ├── hooks/                # Custom React hooks
+│   │   │   ├── usePrompts.tsx
+│   │   │   ├── usePlaceholders.tsx # Placeholder management hook
+│   │   │   └── useWorkspace.tsx  # Workspace management hook
+│   │   ├── services/             # Business logic services
+│   │   │   ├── prompt-service.ts # Prompt management service
+│   │   │   ├── storage-service.ts # Storage operations service
+│   │   │   └── export-service.ts # Import/export service
+│   │   ├── utils/                # Utility functions
+│   │   │   ├── placeholder-parser.ts # Placeholder parsing utilities
+│   │   │   ├── code-formatter.ts # Code formatting utilities
+│   │   │   └── search-utils.ts   # Search and filtering utilities
+│   │   ├── types/                # TypeScript type definitions
+│   │   │   ├── prompt-types.ts   # Prompt-related types
+│   │   │   ├── workspace-types.ts # Workspace-related types
+│   │   │   └── settings-types.ts # Settings-related types
+│   │   ├── app.tsx               # Main React application
+│   │   └── index.tsx             # Entry point for renderer
+│   └── shared/                   # Shared code between processes
+│       ├── constants.ts          # Shared constants
+│       ├── ipc-types.ts          # IPC message type definitions
+│       └── utils/                # Shared utility functions
+└── package.json                  # Project dependencies and scripts
+```
+
+## 3. Feature Specifications
+
+### Prompt Management
+
+#### Data Model
+
+```typescript
+interface Prompt {
+  id: string;              // Unique identifier
+  title: string;           // Prompt title
+  content: string;         // Prompt content
+  categoryId: string | null; // Associated category
+  tags: string[];          // Associated tags
+  createdAt: Date;         // Creation timestamp
+  updatedAt: Date;         // Last update timestamp
+  favorite: boolean;       // Favorite status
+  usageCount: number;      // Number of times used
+  lastUsed: Date | null;   // Last usage timestamp
+}
+
+interface Category {
+  id: string;              // Unique identifier
+  name: string;            // Category name
+  color: string;           // Display color (hex)
+  parentId: string | null; // Parent category (for nesting)
+  workspaceId: string;     // Associated workspace
+}
+
+interface Tag {
+  id: string;              // Unique identifier
+  name: string;            // Tag name
+  color: string;           // Display color (hex)
+  workspaceId: string;     // Associated workspace
+}
+```
+
+#### Core Functionality
+
+1. **Create Prompt**
+   - Form with fields for title, content, category, and tags
+   - Rich text editor for content with Markdown support
+   - Placeholder detection and highlighting
+   - Auto-save functionality
+
+2. **Edit Prompt**
+   - Same interface as creation with pre-filled values
+   - Version history tracking (optional feature)
+   - Preview mode with placeholder substitution
+
+3. **Delete Prompt**
+   - Confirmation dialog
+   - Optional trash/archive system for recovery
+
+4. **Organize Prompts**
+   - Drag-and-drop categorization
+   - Bulk operations for multiple prompts
+   - Sorting options (alphabetical, recent, most used)
+
+5. **Import/Export**
+   - Support for JSON, Markdown, and plain text formats
+   - Batch import/export functionality
+   - Format conversion utilities
+
+### Placeholder System
+
+#### Placeholder Format
+
+Placeholders will use the format `{{placeholder_name}}` with optional default values: `{{placeholder_name:default_value}}`.
+
+#### Detection and Processing
+
+1. **Regex Pattern**
+
+   ```javascript
+   const placeholderRegex = /\{\{([^:}]+)(?::([^}]*))?\}\}/g;
+   ```
+
+2. **Extraction Function**
+
+   ```typescript
+   function extractPlaceholders(content: string): Placeholder[] {
+     const placeholders: Placeholder[] = [];
+     const matches = content.matchAll(placeholderRegex);
+     
+     for (const match of matches) {
+       placeholders.push({
+         name: match[1],
+         defaultValue: match[2] || '',
+         value: '',
+       });
+     }
+     
+     return placeholders;
+   }
+   ```
+
+3. **Substitution Function**
+
+   ```typescript
+   function substitutePlaceholders(content: string, values: Record<string, string>): string {
+     return content.replace(placeholderRegex, (match, name) => {
+       return values[name] || match;
+     });
+   }
+   ```
+
+#### User Interface
+
+1. **Placeholder Form Generation**
+   - Dynamic form based on detected placeholders
+   - Input validation based on placeholder type
+   - Support for different input types (text, number, select)
+
+2. **Preview Rendering**
+   - Real-time preview with current placeholder values
+   - Highlighting of unfilled placeholders
+   - Toggle between raw and processed views
+
+3. **Value Persistence**
+   - Option to save values for future use
+   - Context-aware suggestions based on previous inputs
+   - Clear all/reset functionality
+
+### Context Code Integration
+
+#### File System Access
+
+1. **File Selection**
+   - File picker dialog via Electron's dialog API
+   - Drag and drop interface for files and folders
+   - Recent files list for quick access
+
+2. **Processing Options**
+   - Include full content vs. file path only
+   - Strip comments option
+   - Apply syntax highlighting in Markdown
+   - Size limitation with warning for large files
+
+3. **Integration Methods**
+   - Insert at cursor position in prompt editor
+   - Create special placeholder for dynamic inclusion
+   - Append to prompt with proper formatting
+
+#### Code Formatting
+
+1. **Markdown Formatting**
+
+   ```typescript
+   function formatCodeForMarkdown(code: string, language: string): string {
+     return `\`\`\`${language}\n${code}\n\`\`\``;
+   }
+   ```
+
+2. **Language Detection**
+   - Based on file extension
+   - Fallback to plain text for unknown types
+   - Manual override option
+
+3. **Size Optimization**
+   - Truncation options for large files
+   - Compression for very large content
+   - Warning and confirmation for files exceeding size limits
+
+### Workspace Management
+
+#### Workspace Model
+
+```typescript
+interface Workspace {
+  id: string;              // Unique identifier
+  name: string;            // Workspace name
+  description: string;     // Workspace description
+  createdAt: Date;         // Creation timestamp
+  updatedAt: Date;         // Last update timestamp
+  settings: WorkspaceSettings; // Workspace-specific settings
+}
+
+interface WorkspaceSettings {
+  defaultCategory: string | null; // Default category for new prompts
+  defaultTags: string[];   // Default tags for new prompts
+  theme: 'light' | 'dark' | 'system'; // UI theme preference
+  shortcuts: Record<string, string>; // Custom shortcut mappings
+  // Other workspace-specific settings
+}
+```
+
+#### Core Functionality
+
+1. **Workspace Creation**
+   - Form for name, description, and initial settings
+   - Option to clone from existing workspace
+   - Template selection for common use cases
+
+2. **Workspace Switching**
+   - Dropdown or sidebar selector
+   - Keyboard shortcut for quick switching
+   - Visual indication of current workspace
+
+3. **Workspace Settings**
+   - UI for configuring workspace-specific settings
+   - Import/export functionality
+   - Reset to defaults option
+
+4. **Data Isolation**
+   - Prompts, categories, and tags scoped to workspace
+   - Option to move/copy items between workspaces
+   - Global items accessible across all workspaces
+
+## 4. User Interface Design
+
+### Main Application Window
+
+1. **Layout**
+   - Sidebar for navigation and workspace selection
+   - Main content area for prompt management
+   - Status bar for application state and shortcuts
+
+2. **Navigation**
+   - Tree view for categories
+   - Tag cloud or list for tag filtering
+   - Search bar with advanced filtering options
+
+3. **Prompt List View**
+   - Card or list layout with toggle option
+   - Sort and filter controls
+   - Preview on hover
+   - Bulk selection and operations
+
+4. **Prompt Editor**
+   - Rich text editor with Markdown support
+   - Toolbar for common formatting operations
+   - Placeholder highlighting and management
+   - Split view for preview
+
+### Floating Window
+
+1. **Activation**
+   - Global shortcut (customizable)
+   - System tray icon click
+   - Optional always-on-top mode
+
+2. **Layout**
+   - Compact design for minimal screen space usage
+   - Search-focused interface
+   - Quick access to recent and favorite prompts
+
+3. **Interaction**
+   - Keyboard navigation for all operations
+   - Click or Enter to select prompt
+   - Escape to dismiss
+   - Drag to reposition
+
+4. **Placeholder Filling**
+   - Inline form for required placeholders
+   - Tab navigation between fields
+   - Auto-focus on first field
+   - Submit button and keyboard shortcut
+
+## 5. Technical Implementation Details
+
+### Electron Configuration
+
+1. **Window Management**
+
+   ```typescript
+   // Main window configuration
+   const createMainWindow = () => {
+     const mainWindow = new BrowserWindow({
+       width: 1200,
+       height: 800,
+       webPreferences: {
+         nodeIntegration: false,
+         contextIsolation: true,
+         preload: path.join(__dirname, 'preload.js')
+       }
+     });
+     
+     mainWindow.loadURL(isDev 
+       ? 'http://localhost:3000' 
+       : `file://${path.join(__dirname, '../build/index.html')}`);
+       
+     return mainWindow;
+   };
+   
+   // Floating window configuration
+   const createFloatingWindow = () => {
+     const floatingWindow = new BrowserWindow({
+       width: 600,
+       height: 400,
+       frame: false,
+       transparent: true,
+       alwaysOnTop: true,
+       skipTaskbar: true,
+       webPreferences: {
+         nodeIntegration: false,
+         contextIsolation: true,
+         preload: path.join(__dirname, 'preload.js')
+       }
+     });
+     
+     floatingWindow.loadURL(isDev 
+       ? 'http://localhost:3000/#/floating' 
+       : `file://${path.join(__dirname, '../build/index.html#floating')}`);
+       
+     return floatingWindow;
+   };
+   ```
+
+2. **Global Shortcuts**
+
+   ```typescript
+   // Register global shortcut
+   const registerGlobalShortcuts = () => {
+     // Default shortcut, can be customized in settings
+     const shortcut = store.get('settings.globalShortcut', 'CommandOrControl+Shift+Space');
+     
+     globalShortcut.register(shortcut, () => {
+       if (floatingWindow && !floatingWindow.isDestroyed()) {
+         if (floatingWindow.isVisible()) {
+           floatingWindow.hide();
+         } else {
+           floatingWindow.show();
+           floatingWindow.focus();
+         }
+       } else {
+         createFloatingWindow();
+       }
+     });
+   };
+   ```
+
+3. **IPC Communication**
+
+   ```typescript
+   // IPC handler setup
+   const setupIPC = () => {
+     // Handle prompt insertion
+     ipcMain.handle('insert-text', async (event, text) => {
+       // Save current clipboard content
+       const previousClipboard = clipboard.readText();
+       
+       // Set new clipboard content
+       clipboard.writeText(text);
+       
+       // Simulate Ctrl+V to paste
+       robot.keyTap('v', 'control');
+       
+       // Small delay before restoring clipboard
+       await new Promise(resolve => setTimeout(resolve, 100));
+       
+       // Restore previous clipboard content
+       clipboard.writeText(previousClipboard);
+       
+       return { success: true };
+     });
+     
+     // Handle file system operations
+     ipcMain.handle('read-file', async (event, path) => {
+       try {
+         const content = await fs.promises.readFile(path, 'utf8');
+         return { success: true, content };
+       } catch (error) {
+         return { success: false, error: error.message };
+       }
+     });
+   };
+   ```
+
+### Data Storage
+
+1. **Storage Adapter**
+
+   ```typescript
+   // Abstract storage adapter
+   interface StorageAdapter {
+     get<T>(key: string, defaultValue?: T): T;
+     set<T>(key: string, value: T): void;
+     delete(key: string): void;
+     has(key: string): boolean;
+     clear(): void;
+   }
+   
+   // Electron store implementation
+   class ElectronStoreAdapter implements StorageAdapter {
+     private store: ElectronStore;
+     
+     constructor(options: ElectronStore.Options<any>) {
+       this.store = new ElectronStore(options);
+     }
+     
+     get<T>(key: string, defaultValue?: T): T {
+       return this.store.get(key, defaultValue) as T;
+     }
+     
+     set<T>(key: string, value: T): void {
+       this.store.set(key, value);
+     }
+     
+     delete(key: string): void {
+       this.store.delete(key);
+     }
+     
+     has(key: string): boolean {
+       return this.store.has(key);
+     }
+     
+     clear(): void {
+       this.store.clear();
+     }
+   }
+   ```
+
+2. **Data Migration**
+
+   ```typescript
+   // Migration manager
+   class MigrationManager {
+     private storage: StorageAdapter;
+     private migrations: Migration[];
+     
+     constructor(storage: StorageAdapter, migrations: Migration[]) {
+       this.storage = storage;
+       this.migrations = migrations;
+     }
+     
+     async migrate(): Promise<void> {
+       const currentVersion = this.storage.get<number>('version', 0);
+       const pendingMigrations = this.migrations
+         .filter(migration => migration.version > currentVersion)
+         .sort((a, b) => a.version - b.version);
+       
+       for (const migration of pendingMigrations) {
+         await migration.up(this.storage);
+         this.storage.set('version', migration.version);
+       }
+     }
+   }
+   
+   interface Migration {
+     version: number;
+     up(storage: StorageAdapter): Promise<void>;
+     down(storage: StorageAdapter): Promise<void>;
+   }
+   ```
+
+### React Component Architecture
+
+1. **Component Hierarchy**
+
+   ```
+   App
+   ├── MainLayout
+   │   ├── Sidebar
+   │   │   ├── WorkspaceSelector
+   │   │   ├── CategoryTree
+   │   │   └── TagList
+   │   ├── MainContent
+   │   │   ├── PromptList
+   │   │   │   └── PromptCard
+   │   │   └── PromptEditor
+   │   │       ├── RichTextEditor
+   │   │       ├── PlaceholderManager
+   │   │       └── FileDropzone
+   │   └── StatusBar
+   └── FloatingWindow
+       ├── SearchBar
+       ├── PromptList
+       │   └── PromptCard
+       └── PlaceholderForm
+   ```
+
+2. **State Management**
+
+   ```typescript
+   // Prompt context
+   const PromptContext = createContext<PromptContextType | undefined>(undefined);
+   
+   export const PromptProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
+     const [prompts, setPrompts] = useState<Prompt[]>([]);
+     const [categories, setCategories] = useState<Category[]>([]);
+     const [tags, setTags] = useState<Tag[]>([]);
+     
+     // Load data from storage
+     useEffect(() => {
+       const loadData = async () => {
+         const storageService = new StorageService();
+         const loadedPrompts = await storageService.getPrompts();
+         const loadedCategories = await storageService.getCategories();
+         const loadedTags = await storageService.getTags();
+         
+         setPrompts(loadedPrompts);
+         setCategories(loadedCategories);
+         setTags(loadedTags);
+       };
+       
+       loadData();
+     }, []);
+     
+     // CRUD operations
+     const createPrompt = async (prompt: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt' | 'usageCount' | 'lastUsed'>) => {
+       const storageService = new StorageService();
+       const newPrompt = await storageService.createPrompt(prompt);
+       setPrompts(prev => [...prev, newPrompt]);
+       return newPrompt;
+     };
+     
+     // Other CRUD operations...
+     
+     const value = {
+       prompts,
+       categories,
+       tags,
+       createPrompt,
+       // Other operations...
+     };
+     
+     return (
+       <PromptContext.Provider value={value}>
+         {children}
+       </PromptContext.Provider>
+     );
+   };
+   ```
+
+## 6. Performance Considerations
+
+### Optimization Strategies
+
+1. **Lazy Loading**
+   - Load prompts in batches or on-demand
+   - Implement virtual scrolling for large lists
+   - Defer loading of non-critical components
+
+2. **Caching**
+   - Cache frequently accessed prompts in memory
+   - Implement LRU cache for recently used items
+   - Store rendered Markdown to avoid re-parsing
+
+3. **Debouncing and Throttling**
+   - Debounce search input to reduce processing
+   - Throttle expensive operations like file processing
+   - Batch updates to storage when possible
+
+4. **Worker Threads**
+   - Offload heavy processing to worker threads
+   - Use worker threads for file parsing and formatting
+   - Implement progress indicators for long operations
+
+### Memory Management
+
+1. **Large File Handling**
+   - Stream large files instead of loading entirely in memory
+   - Implement size limits with user confirmation
+   - Provide options for truncation or summarization
+
+2. **Resource Cleanup**
+   - Properly dispose of event listeners
+   - Implement cleanup in useEffect hooks
+   - Monitor memory usage and implement garbage collection triggers
+
+## 7. Security Considerations
+
+### Data Protection
+
+1. **Local Storage Security**
+   - Encrypt sensitive data at rest
+   - Implement secure storage options
+   - Provide backup and recovery mechanisms
+
+2. **Clipboard Handling**
+   - Preserve user clipboard content
+   - Clear sensitive data after use
+   - Provide clear user feedback about clipboard operations
+
+### File System Access
+
+1. **Sandboxing**
+   - Restrict file system access to user-selected locations
+   - Implement proper error handling for file operations
+   - Validate file types and content before processing
+
+2. **Permission Model**
+   - Request explicit permission for file system access
+   - Remember user preferences for frequently accessed locations
+   - Provide clear feedback about permission status
+
+## 8. Testing and Quality Assurance
+
+### Testing Strategy
+
+1. **Unit Testing**
+   - Test individual components and utilities
+   - Use Jest for JavaScript/TypeScript testing
+   - Implement snapshot testing for UI components
+
+2. **Integration Testing**
+   - Test interactions between components
+   - Verify IPC communication
+   - Test data flow through the application
+
+3. **End-to-End Testing**
+   - Use Playwright for automated UI testing
+   - Test key user workflows
+   - Verify cross-platform compatibility
+
+### Quality Metrics
+
+1. **Code Quality**
+   - Maintain >80% test coverage
+   - Use ESLint and Prettier for code style
+   - Implement pre-commit hooks for quality checks
+
+2. **Performance Benchmarks**
+   - Startup time < 2 seconds
+   - Floating window activation < 200ms
+   - Search results update < 100ms
+
+## 9. Deployment and Distribution
+
+### Build Process
+
+1. **Electron Builder Configuration**
+   - Configure builds for Windows, macOS, and Linux
+   - Implement code signing for trusted distribution
+   - Optimize bundle size with appropriate settings
+
+2. **CI/CD Pipeline**
+   - Implement GitHub Actions workflow
+   - Automate testing and building
+   - Generate platform-specific installers
+
+### Update Mechanism
+
+1. **Auto-Update Implementation**
+   - Use electron-updater for automatic updates
+   - Implement update notification UI
+   - Provide release notes with each update
+
+2. **Version Management**
+   - Follow semantic versioning
+   - Maintain changelog for user reference
+   - Implement data migration for version changes
+
+## 10. Future Considerations
+
+### Potential Enhancements
+
+1. **Cloud Sync**
+   - Optional synchronization of prompts across devices
+   - End-to-end encryption for synced data
+   - Conflict resolution for simultaneous edits
+
+2. **AI Integration**
+   - Prompt suggestions based on usage patterns
+   - Automatic categorization of prompts
+   - Smart placeholder detection and management
+
+3. **Collaboration Features**
+   - Prompt sharing between users
+   - Team workspaces for collaborative environments
+   - Version control for shared prompts
+
+4. **Advanced Templating**
+   - Conditional sections in prompts
+   - Variables and expressions
+   - Template inheritance and composition
+
+### Scalability Considerations
+
+1. **Performance at Scale**
+   - Optimizations for thousands of prompts
+   - Efficient search and filtering for large collections
+   - Resource usage monitoring and optimization
+
+2. **Extensibility**
+   - Plugin architecture for custom functionality
+   - API for third-party integrations
+   - User-defined scripts and automation
+</technical_specification>

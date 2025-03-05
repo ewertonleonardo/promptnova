@@ -1,0 +1,89 @@
+<project_rules>
+
+1. **Controle de Versão e Branching**
+
+- Utilize Git como sistema de controle de versão.
+- Mantenha dois branchs principais: `main` e `dev`.
+- Realize commits no branch `dev` para desenvolvimento contínuo e mescle no `main` somente se for instruido.
+- Abra Pull Requests (PRs) para cada alteração significativa, exigindo revisão antes da fusão (merge) no `main`.
+
+2. **Conformidade de Código e Ferramentas de Análise (Linters)**
+
+2.1. **Estilo de Código e Nomenclatura**  
+   - Utilize o padrão [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript) como base. É bem reconhecido pela comunidade e oferece diretrizes claras para organização de código, formatação e boas práticas.
+   - Siga convenções de nomenclatura consistentes:
+     - Funções, constantes e variáveis em `camelCase`.
+     - Classes e componentes em `PascalCase`.
+     - Arquivos em `kebab-case` ou `snake_case` (considere manter um único padrão para todo o projeto).
+   - Sempre utilize `import` em vez de `require`, se estiver usando Babel ou TypeScript, para manter o padrão modular moderno.
+
+2.2. **Linting**  
+   - Empregue o **ESLint** como ferramenta de linting, combinando com o **Prettier** para formatação automática.
+   - Crie um arquivo de configuração (`.eslintrc.js` ou `.eslintrc.json`) que estenda as regras do Airbnb e integre com o Prettier:
+     ```json
+     {
+       "extends": [
+         "airbnb",
+         "airbnb/hooks",
+         "plugin:react/recommended",
+         "plugin:@typescript-eslint/recommended", // se for TypeScript
+         "plugin:prettier/recommended"
+       ],
+       "rules": {
+         // Acrescente regras específicas do projeto, se necessário
+       }
+     }
+     ```
+   - Habilite o **Plugin React** (`eslint-plugin-react`) e o **eslint-plugin-jsx-a11y** para assegurar boas práticas em interfaces React.
+   - Caso use TypeScript, inclua o **@typescript-eslint/eslint-plugin** e **@typescript-eslint/parser**, para verificação adicional de tipos.
+
+2.3. **Prettier**  
+   - Centralize a configuração do Prettier em um arquivo `.prettierrc`, especificando regras como tamanho de indentação, uso ou não de ponto-e-vírgula, aspas simples ou duplas, etc. Por exemplo:
+     ```json
+     {
+       "semi": true,
+       "singleQuote": true,
+       "printWidth": 80,
+       "tabWidth": 2,
+       "trailingComma": "all"
+     }
+     ```
+   - Garanta que o Prettier seja executado antes dos commits ou em cada salvamento de arquivo, usando hooks do Git (por meio do [Husky](https://typicode.github.io/husky/) e [lint-staged](https://github.com/okonet/lint-staged)) ou configurações específicas do seu editor/IDE.
+
+2.4. **Padronização e Automatização**  
+   - Configure hooks de pré-commit para rodar `eslint` e `prettier --check`, impedindo que commits com problemas de formatação sejam aceitos.
+   - Faça uso do **lint-staged** para rodar apenas nos arquivos modificados, otimizando o processo.
+   - Integre o fluxo de lint e testes automatizados em pipelines de CI/CD para manter a qualidade e consistência contínua do código.
+
+2.5. **Boas Práticas Gerais**  
+   - Sempre mantenha o código bem comentado, principalmente nas seções mais complexas ou específicas do sistema (p. ex., integrações com Electron ou gerenciamento de prompt/contexto).
+   - Evite funções e componentes muito extensos. Se um componente React estiver crescendo demais, avalie extrair parte da lógica para hooks ou módulos separados.
+   - Use constantes para strings repetidas e valores fixos. Ajuda na manutenibilidade e clareza.
+
+
+3. **Commits com Convenção Padrão (Conventional Commits)**
+
+- Siga rigorosamente as diretrizes de [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) para facilitar a rastreabilidade e a geração automática de changelogs.
+- Use prefixos como `feat:`, `fix:`, `docs:`, `refactor:`, entre outros, de acordo com o escopo da alteração.
+- Mantenha o corpo da mensagem de commit conciso e informativo, referenciando ID de tarefas ou issues quando apropriado.
+
+4. **Documentação**
+
+- Mantenha um arquivo `README.md` bem estruturado, seguindo as recomendações do [Make a README](https://www.makeareadme.com). 
+- Detalhe no `README.md` instruções de instalação, configuração, uso e contribuição ao projeto.
+- Crie uma pasta `documentation` se houver necessidade de documentação mais extensa, como tutoriais ou guias de desenvolvimento.
+- Insira comentários pertinentes no código para facilitar o entendimento de lógicas complexas e integrações específicas do PromptNova.
+
+5. **Conduta e Colaboração**
+
+- Estabeleça um Código de Conduta que promova respeito e colaboração saudável entre todos os participantes do projeto.
+- Exija que todos os colaboradores leiam e concordem com o Código de Conduta antes de contribuir.
+- Mantenha canais de comunicação claros, incentivando a troca de feedback construtivo e a resolução ágil de conflitos.
+
+6. **Gestão de Lançamentos (Release Management)**
+
+- Aplique a versão do projeto seguindo estritamente as regras de [Semantic Versioning](https://semver.org/lang/pt-BR/) (x.y.z).
+- Mantenha e atualize o arquivo de changelog seguindo o padrão [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/), documentando claramente as alterações em cada lançamento.
+- Registre as mudanças (novos recursos, correções e aprimoramentos) em cada versão no changelog, facilitando a comunicação com a equipe e usuários finais.
+
+</project_rules>

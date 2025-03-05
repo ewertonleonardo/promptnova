@@ -1,0 +1,97 @@
+<project_request>
+
+# PromptNova
+
+## Project Description
+
+PromptNova is a desktop application designed to centralize the storage and utilization of prompts, primarily for AI interactions but also for other types of commands. The application aims to eliminate the need for manual copying and pasting of prompts by providing an organized, agile environment with seamless integration with Windows, Linux, and macOS applications. With just a keyboard shortcut, users can access their prompts, fill in placeholders as needed, and quickly insert them into any text field.
+
+## Target Audience
+
+- AI power users who frequently use the same or similar prompts
+- Developers who need quick access to code snippets or commands
+- Content creators who use AI tools as part of their workflow
+- Technical writers and documentation specialists
+- Anyone who frequently uses repetitive text inputs across different applications
+
+## Desired Features
+
+### Prompt Management
+
+- [ ] Organized storage system for prompts
+  - [ ] Categorization by folders and tags
+  - [ ] Intuitive interface for adding, removing, and editing prompts
+  - [ ] Local storage of prompts for offline access
+- [ ] Import and export functionality
+  - [ ] Support for multiple formats (Markdown, JSON, XML)
+  - [ ] Backup and restore capabilities
+
+### User Interface
+
+- [ ] Floating window functionality
+  - [ ] Ability to stay on top of other applications
+  - [ ] Compact and non-intrusive design
+- [ ] Search and navigation features
+  - [ ] Dynamic filtering of prompts as user types
+  - [ ] Keyboard navigation using arrow keys
+  - [ ] Quick selection with Enter key
+- [ ] Customizable keyboard shortcuts
+  - [ ] Global shortcuts for application access
+  - [ ] Action-specific shortcuts (send prompt, copy output, etc.)
+
+### Placeholder System
+
+- [ ] Automatic identification of placeholders (e.g., `{{IDEA}}`)
+- [ ] Pop-up interface for configuring placeholder values
+  - [ ] Side-by-side preview of original prompt and final result
+  - [ ] Easy editing of placeholder content
+
+### Context Code Integration
+
+- [ ] Drag & drop functionality for files and folders
+  - [ ] Automatic extraction of file paths and content
+  - [ ] Markdown code block formatting with language detection
+- [ ] Context code management options
+  - [ ] Manual addition of files or folders
+  - [ ] Path-only or full content inclusion options
+  - [ ] Filtering capabilities for files and folders
+  - [ ] Size limitation settings
+- [ ] Advanced code processing options
+  - [ ] Comment stripping functionality
+  - [ ] Empty line removal
+  - [ ] Line wrapping controls
+  - [ ] Source code positioning options
+
+### Workspace Management
+
+- [ ] Support for multiple workspaces ("Spaces")
+  - [ ] Individual configurations per workspace
+  - [ ] Separate folder structures
+  - [ ] Easy switching between workspaces
+
+## Design Requests
+
+- [ ] Modern, responsive interface
+  - [ ] Implementation using React with Tailwind CSS
+  - [ ] Protocol template integration
+  - [ ] Clean, intuitive layout
+- [ ] Seamless system integration
+  - [ ] Electron-based implementation
+  - [ ] Global shortcut registration
+  - [ ] Clipboard interaction capabilities
+- [ ] User-friendly workflow
+  - [ ] Minimal clicks to complete common tasks
+  - [ ] Logical progression through the application
+  - [ ] Clear visual feedback for actions
+
+## Other Notes
+
+- The application should be built using Electron for cross-platform compatibility (Windows, Linux, macOS)
+- React with Tailwind CSS will be used for the frontend, leveraging the Protocol template
+- The modular structure should allow for future expansions and integrations
+- Performance is critical, especially for the floating window and global shortcut functionality
+- Consider implementing a plugin system for future extensibility
+- Ensure proper error handling for file operations and system integrations
+- Include comprehensive documentation for both users and developers
+
+</project_request>
