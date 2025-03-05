@@ -7,15 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- **Step 5**: Define data models and implement storage solutions for managing prompts and workspaces.
-- **Step 6**: Create foundational UI components using Tailwind CSS for a consistent and reusable design.
-- **Step 7**: Build the floating window interface, including search and prompt listing functionalities.
+- **Step 4.1**: Create a foundation for future plugin extensions, including lifecycle management and UI components.
+- **Step 6**: Utilize existing UI components according to a component-functionality mapping guide and verify their integration.
+- **Step 7**: Adapt template components for a floating interface, including search and window management.
 - **Step 8**: Implement CRUD operations for prompt management, allowing users to create, read, update, and delete prompts.
 - **Step 9**: Integrate a placeholder system for detecting and managing placeholders within prompts.
 - **Step 10**: Add file system integration features, such as drag-and-drop and file previews, to enhance user interaction.
 - **Step 11**: Develop workspace management features, enabling users to select and configure workspaces.
-- **Step 13**: Write comprehensive documentation for both users and developers to facilitate understanding and contribution.
-- **Step 14**: Set up build and distribution configurations, including CI/CD workflows, to automate the deployment process.
+- **Step 13**: Add support for importing and exporting prompts, including utilities and UI components.
+- **Step 14**: Implement advanced code processing features, including comment removal and processing options.
+- **Step 15**: Ensure the application is accessible by adding accessibility components, hooks, and styles.
+- **Step 16**: Write comprehensive user and developer documentation to facilitate understanding and contribution.
+- **Step 17**: Set up build and distribution configurations, including CI/CD workflows, to automate the deployment process.
+- **Step 18**: Add error tracking and recovery mechanisms to enhance application stability and user experience.
+- **Step 19**: Configure Git hooks and enforce project rules to maintain version control compliance and code quality.
+
+## [0.0.0_commit5] - 2024-03-05
+
+- **Step 5**: Define data models and implement storage solutions for managing prompts and workspaces.
+- Added the logo to the project.
+
+### Added
+
+- Data Models implementation for managing application data:
+  - Prompt Model with validation, placeholder extraction, and serialization
+  - Workspace Model with prompt collection management and CRUD operations
+- Storage System for persistent data management:
+  - Local file-based storage for workspaces and prompts
+  - Import/export capabilities for data portability
 
 ## [0.0.0_commit4] - 2024-03-05
 
