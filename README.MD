@@ -1,6 +1,6 @@
 # PromptNova
 
-![Version](https://img.shields.io/badge/Version-0.0.0__commit3-purple?style=for-the-badge&logo=git&logoColor=purple&labelColor=%23eee)
+![Version](https://img.shields.io/badge/Version-0.0.0__commit4-purple?style=for-the-badge&logo=git&logoColor=purple&labelColor=%23eee)
 ![License](https://img.shields.io/badge/License-GNU-purple?style=for-the-badge&logo=gnu&logoColor=purple&labelColor=%23eee)
 ![Electron](https://img.shields.io/badge/Electron-23.6.9-purple?style=for-the-badge&logo=electron&logoColor=purple&labelColor=%23eee)
 ![React](https://img.shields.io/badge/React-18.2.0-purple?style=for-the-badge&logo=react&logoColor=purple&labelColor=%23eee)
@@ -113,6 +113,42 @@ const text = clipboardManager.readText();
 if (clipboardManager.hasText()) {
   // Process clipboard content
 }
+```
+
+## IPC Communication System
+
+PromptNova uses an IPC (Inter-Process Communication) system to facilitate communication between the main Electron process and the renderer process:
+
+### IPC Handlers
+
+The application uses a structured approach to IPC communication through dedicated handler files:
+
+**Purpose**: Enables secure and type-safe communication between the main Electron process and the renderer UI process.
+
+**Files Structure**:
+- `/src/main/ipc/index.ts`: Central registration point for all IPC handlers
+- `/src/main/ipc/prompt.ts`: Handlers for prompt-related operations
+- `/src/main/ipc/workspace.ts`: Handlers for workspace-related operations
+- `/src/shared/ipc-types.ts`: Type definitions for IPC messages
+
+**Usage**:
+```typescript
+// Renderer process: Send a request to the main process
+import { ipcRenderer } from 'electron';
+import { IPCChannels } from '@/shared/ipc-types';
+
+// Request to save a prompt
+const result = await ipcRenderer.invoke(IPCChannels.SAVE_PROMPT, promptData);
+
+// Main process: Handle the request in the appropriate handler
+import { ipcMain } from 'electron';
+import { IPCChannels } from '@/shared/ipc-types';
+
+// Register the handler
+ipcMain.handle(IPCChannels.SAVE_PROMPT, async (event, promptData) => {
+  // Process the request and return the result
+  return await savePromptToStorage(promptData);
+});
 ```
 
 ## Changelog

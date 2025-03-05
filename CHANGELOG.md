@@ -7,7 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- **Step 4**: Establish IPC communication channels between the main and renderer processes for seamless data exchange.
 - **Step 5**: Define data models and implement storage solutions for managing prompts and workspaces.
 - **Step 6**: Create foundational UI components using Tailwind CSS for a consistent and reusable design.
 - **Step 7**: Build the floating window interface, including search and prompt listing functionalities.
@@ -18,11 +17,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Step 13**: Write comprehensive documentation for both users and developers to facilitate understanding and contribution.
 - **Step 14**: Set up build and distribution configurations, including CI/CD workflows, to automate the deployment process.
 
+## [0.0.0_commit4] - 2024-03-05
+
+- **Step 4**: Establish IPC communication channels between the main and renderer processes for seamless data exchange.
+
+### Added
+
+- IPC Communication System implementation with structured handler files
+  - Central registration point for all IPC handlers
+  - Type-safe communication between main and renderer processes
+  - Dedicated handlers for prompt and workspace operations
+
 ## [0.0.0_commit3] - 2024-03-05
 
 - **Step 3**: Develop core system managers for handling global shortcuts, file system operations, clipboard actions, and window management.
 
 ### Added
+
 - Core system managers implementation:
   - ShortcutManager for handling global keyboard shortcuts
   - FileSystemManager for file system operations

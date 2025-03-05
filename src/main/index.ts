@@ -6,6 +6,7 @@
  */
 
 import { app, BrowserWindow, ipcMain, globalShortcut } from 'electron';
+import { registerIpcHandlers } from './ipc/index';
 import * as path from 'path';
 import * as url from 'url';
 
@@ -60,6 +61,9 @@ function createWindow() {
  */
 app.whenReady().then(() => {
   createWindow();
+  
+  // Register all IPC handlers
+  registerIpcHandlers();
 
   // Set up global shortcuts here
   // Example: globalShortcut.register('CommandOrControl+Space', () => { /* Show/hide app */ });
@@ -90,10 +94,5 @@ app.on('will-quit', () => {
   globalShortcut.unregisterAll();
 });
 
-/**
- * Set up IPC handlers for communication with renderer process
- * These will be expanded as we implement more features
- */
-ipcMain.handle('app:get-version', () => {
-  return app.getVersion();
-});
+// Note: IPC handlers are now registered in the registerIpcHandlers function
+// from the ipc/index.ts file. This provides better organization and separation of concerns.
