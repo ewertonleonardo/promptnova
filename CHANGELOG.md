@@ -8,6 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - **Step 7**: Adapt template components for a floating interface, including search and window management.
+
+### Added
+
+- UI Components implementation:
+  - FloatingPanel component for lightweight, non-intrusive overlay window
+  - SearchBar component with real-time search functionality
+  - CodePreview component for syntax-highlighted code display
+- Workspace management components implementation:
+  - WorkspaceContext for centralized workspace state management
+  - WorkspaceContextProvider for providing workspace context to components
+  - Enhanced SectionProvider with workspace integration capabilities
+  - WorkspaceManager component for workspace creation, deletion, and organization
+  - Workspace Model with configuration and state persistence
+  - Plugin Interface for standardized plugin development
+  - Plugin Store UI for managing plugin discovery and installation
+- Code Processing System implementation:
+  - CodeProcessor component for standardized code manipulation
+  - Language-specific processing rules for multiple programming languages
+  - Comment stripping with documentation preservation options
+  - Whitespace normalization and empty line handling
+  - Extensible design for additional language support
+  
+### Planned
+
 - **Step 8**: Implement CRUD operations for prompt management, allowing users to create, read, update, and delete prompts.
 - **Step 9**: Integrate a placeholder system for detecting and managing placeholders within prompts.
 - **Step 10**: Add file system integration features, such as drag-and-drop and file previews, to enhance user interaction.
@@ -25,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Step 6**: Utilize existing UI components according to a component-functionality mapping guide and verify their integration.
 
 ### Added
+
 - Foundation for plugin extensions system
 - Data models for prompt and workspace management
 - Storage solutions for persistent data

@@ -77,7 +77,7 @@
 
 ## UI Components and Layout
 
-- [ ] Step 6: Map Core Components to System Features
+- [X] Step 6: Map Core Components to System Features
   - **Task**: Utilize existing UI components according to [Component-Functionality Mapping](D:\Projects\PromptNova\BaseFiles\ComponentMapping.md)
   - **Files**:
     - `src/`: Folder with UI components and Layout

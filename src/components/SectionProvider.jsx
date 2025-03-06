@@ -6,6 +6,8 @@ import {
   useState,
 } from 'react'
 import { createStore, useStore } from 'zustand'
+import { workspaceContext } from '@/shared/WorkspaceContextProvider'
+import { WorkspaceEvent } from '@/shared/models/WorkspaceContext'
 
 import { remToPx } from '@/lib/remToPx'
 
@@ -13,12 +15,16 @@ function createSectionStore(sections) {
   return createStore((set) => ({
     sections,
     visibleSections: [],
-    setVisibleSections: (visibleSections) =>
-      set((state) =>
-        state.visibleSections.join() === visibleSections.join()
-          ? {}
-          : { visibleSections }
-      ),
+    setVisibleSections: (visibleSections) => {
+      set((state) => {
+        if (state.visibleSections.join() === visibleSections.join()) {
+          return {};
+        }
+        // Persist visible sections to workspace state
+        workspaceContext.updateWorkspaceState({ visibleSections });
+        return { visibleSections };
+      });
+    },
     registerHeading: ({ id, ref, offsetRem }) =>
       set((state) => {
         return {
@@ -97,6 +103,35 @@ const useIsomorphicLayoutEffect =
 
 export function SectionProvider({ sections, children }) {
   let [sectionStore] = useState(() => createSectionStore(sections))
+  let [initialized, setInitialized] = useState(false)
+
+  // Initialize with workspace state
+  useEffect(() => {
+    const initializeFromWorkspace = async () => {
+      const workspace = await workspaceContext.getCurrentWorkspace();
+      if (workspace && workspace.state.visibleSections) {
+        sectionStore.getState().setVisibleSections(workspace.state.visibleSections);
+      }
+      setInitialized(true);
+    };
+
+    initializeFromWorkspace();
+
+    // Listen for workspace changes
+    const handleWorkspaceChange = (workspace) => {
+      if (workspace.state.visibleSections) {
+        sectionStore.getState().setVisibleSections(workspace.state.visibleSections);
+      }
+    };
+
+    workspaceContext.addEventListener(WorkspaceEvent.WORKSPACE_CHANGED, handleWorkspaceChange);
+    workspaceContext.addEventListener(WorkspaceEvent.STATE_UPDATED, handleWorkspaceChange);
+
+    return () => {
+      workspaceContext.removeEventListener(WorkspaceEvent.WORKSPACE_CHANGED, handleWorkspaceChange);
+      workspaceContext.removeEventListener(WorkspaceEvent.STATE_UPDATED, handleWorkspaceChange);
+    };
+  }, [sectionStore])
 
   useVisibleSections(sectionStore)
 

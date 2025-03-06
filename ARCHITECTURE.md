@@ -151,6 +151,8 @@ The application uses a structured approach to IPC communication through dedicate
 - `/src/main/ipc/prompt.ts`: Handlers for prompt-related operations
 - `/src/main/ipc/workspace.ts`: Handlers for workspace-related operations
 - `/src/shared/ipc-types.ts`: Type definitions for IPC messages
+- `/src/main/ipc/templates.ts`: Template management handlers
+- `/src/shared/models/WorkspaceTemplate.ts`: Template type definitions
 
 **Usage**:
 
@@ -188,6 +190,7 @@ Manages the lifecycle and operations of plugins.
 **Purpose**: Handles plugin loading, initialization, activation, and deactivation while ensuring secure execution.
 
 **Features**:
+
 - Plugin lifecycle management
 - Secure plugin loading and execution
 - Plugin state management
@@ -206,6 +209,276 @@ pluginManager.activatePlugin(pluginId);
 pluginManager.on('stateChange', (pluginId, state) => {
   console.log(`Plugin ${pluginId} state changed to ${state}`);
 });
+```
+
+## Workspace Management System
+
+PromptNova implements a comprehensive workspace management system for organizing and persisting user workspaces:
+
+### WorkspaceContext
+
+Provides an interface for workspace operations and state management.
+
+**Purpose**: Defines the contract for workspace-related operations, including retrieving, switching, and updating workspaces.
+
+**Features**:
+
+- Workspace state and configuration management
+- Event-based architecture for workspace changes
+- Strongly-typed interfaces for workspace operations
+
+**Files**:
+
+- `/src/shared/models/WorkspaceContext.ts`: Core interfaces and types
+- `/src/shared/WorkspaceContextProvider.ts`: Implementation of the context interface
+
+**Usage**:
+
+```typescript
+// Get the current workspace
+const workspace = await workspaceContext.getCurrentWorkspace();
+
+// Switch to a different workspace
+const success = await workspaceContext.switchWorkspace(workspaceId);
+
+// Update workspace state
+await workspaceContext.updateWorkspaceState({
+  currentSectionId: 'section-1',
+  visibleSections: ['section-1', 'section-2']
+});
+
+// Listen for workspace changes
+workspaceContext.addEventListener(WorkspaceEvent.WORKSPACE_CHANGED, (workspace) => {
+  // Handle workspace change
+  console.log('Workspace changed:', workspace.config.name);
+});
+```
+
+### WorkspaceManager Component
+
+Manages workspace creation, deletion, and organization.
+
+**Purpose**: Provides a centralized interface for managing workspace lifecycle and structure, including templates and folder organization.
+
+**Features**:
+
+- Folder structure management for workspaces
+- Workspace creation and deletion functionality
+- Template system for quick workspace setup
+- Workspace metadata management
+
+**Files**:
+
+- `/src/components/WorkspaceManager.jsx`: Main component implementation
+- `/src/shared/models/WorkspaceTemplate.ts`: Template definitions
+
+**Usage**:
+
+```typescript
+// Create a new workspace from template
+workspaceManager.createWorkspace({
+  name: "New Project",
+  templateId: "default-template"
+});
+
+// Delete a workspace
+workspaceManager.deleteWorkspace(workspaceId);
+
+// Get available workspace templates
+const templates = workspaceManager.getTemplates();
+```
+
+### Enhanced SectionProvider
+
+Provides context-aware section management with workspace integration.
+
+**Purpose**: Manages sections within workspaces, handling context switching and persistence.
+
+**Features**:
+
+- Workspace context handling capability
+- Workspace switching logic
+- Local storage integration for persistence
+- Section visibility state management
+
+**Files**:
+
+- `/src/components/SectionProvider.jsx`: Enhanced provider implementation
+
+**Usage**:
+
+```typescript
+// Access the section provider within a component
+const { sections, currentSection, switchSection } = useSectionProvider();
+
+// Switch to a different section with workspace context
+switchSection('documentation', { preserveWorkspaceState: true });
+
+// Get sections for current workspace
+const workspaceSections = sections.filter(s => s.workspaceId === currentWorkspaceId);
+```
+
+### Updated SettingsPanel
+
+Provides workspace-specific settings management.
+
+**Purpose**: Allows users to configure workspace-specific settings and manage workspace data.
+
+**Features**:
+
+- Workspace-specific storage implementation
+- UI for workspace settings configuration
+- Import/export functionality for workspaces
+- Settings persistence across sessions
+
+**Files**:
+
+- `/src/components/SettingsPanel.jsx`: Updated panel implementation
+
+**Usage**:
+
+```typescript
+// Access settings panel functionality
+const { settings, updateSettings, exportWorkspace } = useSettingsPanel();
+
+// Update workspace-specific settings
+updateSettings({
+  theme: "dark",
+  fontSize: 14,
+  workspaceId: currentWorkspaceId
+});
+
+// Export current workspace
+exportWorkspace(currentWorkspaceId, exportPath);
+```
+
+### Workspace Model
+
+Organizes collections of prompts with workspace-level management.
+
+**Purpose**: Provides a container for organizing prompts with workspace-specific metadata and operations.
+
+**Features**:
+
+- Workspace configuration with settings like theme and font size
+- Workspace state persistence (section visibility, scroll position)
+- Event-driven updates for real-time synchronization
+- IPC communication for main and renderer process coordination
+
+**Usage**:
+
+```typescript
+// Create a workspace context provider
+const workspaceProvider = new WorkspaceContextProvider();
+
+// Update workspace configuration
+workspaceProvider.updateWorkspaceConfig({
+  name: "Updated Workspace",
+  settings: { theme: "dark" }
+});
+
+// Access workspace state
+const workspace = await workspaceProvider.getCurrentWorkspace();
+console.log(workspace.state.visibleSections);
+```
+
+```
+
+## Code Processing System
+
+PromptNova implements a code processing system to handle various programming languages and code transformations:
+
+### CodeProcessor Component
+
+Provides utilities for processing and transforming code in different programming languages.
+
+**Purpose**: Enables standardized code manipulation across the application, including comment stripping, whitespace handling, and empty line removal.
+
+**Features**:
+- Language-specific processing rules
+- Comment stripping with documentation preservation options
+- Whitespace normalization
+- Empty line handling
+- Extensible design for additional languages
+
+**Files**:
+- `/src/shared/CodeProcessor.ts`: Main implementation
+- `/src/shared/models/SupportedLanguage.ts`: Supported language definitions
+
+**Usage**:
+
+```typescript
+// Import the processor and language enum
+import { CodeProcessor } from '@/shared/CodeProcessor';
+import { SupportedLanguage } from '@/shared/models/SupportedLanguage';
+
+// Process JavaScript code with default options
+const processedCode = CodeProcessor.process(
+  sourceCode,
+  SupportedLanguage.JavaScript
+);
+
+// Process with custom options
+const cleanCode = CodeProcessor.process(
+  sourceCode,
+  SupportedLanguage.Python,
+  {
+    stripComments: true,
+    preserveDocComments: true,
+    removeEmptyLines: true,
+    trimWhitespace: true
+  }
+);
+```
+
+### CodeCleaner Component
+
+Provides specialized empty line management and code formatting capabilities.
+
+**Purpose**: Offers fine-grained control over empty line handling in code, with preservation rules for maintaining code readability while reducing unnecessary whitespace.
+
+**Features**:
+- Empty line removal with configurable preservation rules
+- Intelligent spacing preservation around documentation, functions, and classes
+- Configurable consecutive empty line limits
+- Batch processing capability for multiple files
+- Language-specific pattern recognition
+
+**Files**:
+- `/src/shared/CodeCleaner.ts`: Main implementation
+- `/src/shared/models/SupportedLanguage.ts`: Shared language definitions
+
+**Usage**:
+
+```typescript
+// Import the cleaner and language enum
+import { CodeCleaner } from '@/shared/CodeCleaner';
+import { SupportedLanguage } from '@/shared/models/SupportedLanguage';
+
+// Clean JavaScript code with default options
+const cleanedCode = CodeCleaner.clean(
+  sourceCode,
+  SupportedLanguage.JavaScript
+);
+
+// Clean with custom options
+const formattedCode = CodeCleaner.clean(
+  sourceCode,
+  SupportedLanguage.TypeScript,
+  {
+    preserveDocumentationSpacing: true,
+    preserveFunctionSpacing: true,
+    preserveClassSpacing: false,
+    minConsecutiveEmptyLines: 0,
+    maxConsecutiveEmptyLines: 1
+  }
+);
+
+// Process multiple files in batch
+const batchResults = CodeCleaner.batchClean([
+  { code: jsCode, language: SupportedLanguage.JavaScript },
+  { code: tsCode, language: SupportedLanguage.TypeScript }
+]);
 ```
 
 ### Plugin Interface
@@ -248,6 +521,7 @@ Provides user interface components for managing plugins.
 **Purpose**: Enables users to discover, install, configure, and manage plugins through a graphical interface.
 
 **Features**:
+
 - Plugin discovery and installation
 - Plugin configuration interface
 - Plugin state visualization
@@ -277,6 +551,7 @@ Provides a lightweight, floating interface for quick prompt access.
 **Purpose**: Creates a non-intrusive overlay window that can be summoned anywhere in the system for quick prompt access and management.
 
 **Features**:
+
 - Always-on-top functionality
 - Compact and minimalist design
 - Smooth animations and transitions
@@ -303,6 +578,7 @@ Provides real-time search functionality across prompts and workspaces.
 **Purpose**: Enables quick access to prompts through intelligent search with support for tags, categories, and content matching.
 
 **Features**:
+
 - Real-time search results
 - Tag and category filtering
 - Fuzzy matching
@@ -330,6 +606,7 @@ Displays code snippets and context with syntax highlighting.
 **Purpose**: Renders code content with proper formatting and syntax highlighting for better readability.
 
 **Features**:
+
 - Multi-language syntax highlighting
 - Line numbers
 - Code folding

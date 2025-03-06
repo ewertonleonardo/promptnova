@@ -55,6 +55,12 @@ export const IPC_CHANNELS = {
   WORKSPACE_GET_BY_ID: 'workspace:get-by-id',
   WORKSPACE_SET_ACTIVE: 'workspace:set-active',
   WORKSPACE_GET_ACTIVE: 'workspace:get-active',
+  
+  // Workspace template channels
+  WORKSPACE_LOAD_TEMPLATES: 'workspace:loadTemplates',
+  WORKSPACE_CREATE_TEMPLATE: 'workspace:createTemplate',
+  WORKSPACE_UPDATE_TEMPLATE: 'workspace:updateTemplate',
+  WORKSPACE_DELETE_TEMPLATE: 'workspace:deleteTemplate',
 } as const;
 
 // Response types
