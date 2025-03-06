@@ -7,7 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- **Step 6**: Utilize existing UI components according to a component-functionality mapping guide and verify their integration.
 - **Step 7**: Adapt template components for a floating interface, including search and window management.
 - **Step 8**: Implement CRUD operations for prompt management, allowing users to create, read, update, and delete prompts.
 - **Step 9**: Integrate a placeholder system for detecting and managing placeholders within prompts.
@@ -20,6 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Step 17**: Set up build and distribution configurations, including CI/CD workflows, to automate the deployment process.
 - **Step 18**: Add error tracking and recovery mechanisms to enhance application stability and user experience.
 - **Step 19**: Configure Git hooks and enforce project rules to maintain version control compliance and code quality.
+
+## [0.0.0_commit7] - 2024-03-06
+
+> **Step 6**: Utilize existing UI components according to a component-functionality mapping guide and verify their integration.
+
+### Added
+- Foundation for plugin extensions system
+- Data models for prompt and workspace management
+- Storage solutions for persistent data
 
 ## [0.0.0_commit6] - 2024-03-06
 

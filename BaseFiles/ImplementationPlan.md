@@ -46,7 +46,7 @@
   - **Step Dependencies**: Step 3
   - **User Instructions**: None
 
-- [ ] Step 4.1: Implement Plugin System Infrastructure
+- [X] Step 4.1: Implement Plugin System Infrastructure
   - **Task**: Create foundation for future plugin extensions
   - **Files**:
     - `/src/main/plugins/PluginManager.ts`: Plugin lifecycle management
@@ -65,7 +65,7 @@
 
 ## Data Layer Implementation
 
-- [ ] Step 5: Create Data Models and Storage
+- [X] Step 5: Create Data Models and Storage
   - **Task**: Implement data models and storage adapters
   - **Files**:
     - `/src/shared/models/Prompt.ts`: Prompt data model
