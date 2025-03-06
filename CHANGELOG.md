@@ -7,21 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Planned
+
+- **Step 8**: Implement CRUD operations for prompt management, allowing users to create, read, update, and delete prompts.
+- **Step 9**: Integrate a placeholder system for detecting and managing placeholders within prompts.
+- **Step 10**: Add file system integration features, such as drag-and-drop and file previews, to enhance user interaction.
+- **Step 11**: Develop workspace management features, enabling users to select and configure workspaces.
+- **Step 13**: Add support for importing and exporting prompts, including utilities and UI components.
+- **Step 14**: Implement advanced code processing features, including comment removal and processing options.
+- **Step 15**: Ensure the application is accessible by adding accessibility components, hooks, and styles.
+- **Step 16**: Write comprehensive user and developer documentation to facilitate understanding and contribution.
+- **Step 17**: Set up build and distribution configurations, including CI/CD workflows, to automate the deployment process.
+- **Step 18**: Add error tracking and recovery mechanisms to enhance application stability and user experience.
+- **Step 19**: Configure Git hooks and enforce project rules to maintain version control compliance and code quality.
+
+## [0.0.0_commit8] - 2024-03-06
+
 - **Step 7**: Adapt template components for a floating interface, including search and window management.
 
 ### Added
 
-- UI Components implementation:
-  - FloatingPanel component for lightweight, non-intrusive overlay window
-    - Added size constraints for better window management
-    - Implemented position memory for consistent user experience
-    - Enhanced performance through optimized rendering
-  - WindowManager integration for enhanced window control
-    - Completed Electron integration for native window functionality
-    - Implemented stay-on-top functionality for improved workflow
-    - Added window state management for persistent window configurations
-  - SearchBar component with real-time search functionality
-  - CodePreview component for syntax-highlighted code display
+- SearchBar Enhancement implementation:
+  - Connected to prompt database for data retrieval
+  - Implemented real-time search functionality
+  - Added advanced filtering options for refined search results
+
 - Workspace management components implementation:
   - WorkspaceContext for centralized workspace state management
   - WorkspaceContextProvider for providing workspace context to components
@@ -37,20 +47,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Whitespace normalization and empty line handling
   - Extensible design for additional language support
   
-### Planned
-
-- **Step 8**: Implement CRUD operations for prompt management, allowing users to create, read, update, and delete prompts.
-- **Step 9**: Integrate a placeholder system for detecting and managing placeholders within prompts.
-- **Step 10**: Add file system integration features, such as drag-and-drop and file previews, to enhance user interaction.
-- **Step 11**: Develop workspace management features, enabling users to select and configure workspaces.
-- **Step 13**: Add support for importing and exporting prompts, including utilities and UI components.
-- **Step 14**: Implement advanced code processing features, including comment removal and processing options.
-- **Step 15**: Ensure the application is accessible by adding accessibility components, hooks, and styles.
-- **Step 16**: Write comprehensive user and developer documentation to facilitate understanding and contribution.
-- **Step 17**: Set up build and distribution configurations, including CI/CD workflows, to automate the deployment process.
-- **Step 18**: Add error tracking and recovery mechanisms to enhance application stability and user experience.
-- **Step 19**: Configure Git hooks and enforce project rules to maintain version control compliance and code quality.
-
 ## [0.0.0_commit7] - 2024-03-06
 
 > **Step 6**: Utilize existing UI components according to a component-functionality mapping guide and verify their integration.

@@ -1,6 +1,6 @@
 # ![PromptNova Logo](src/logo/DarkBgRectangle.svg)
 
-![Version](https://img.shields.io/badge/Version-0.0.0__commit7-4d179a?style=for-the-badge&logo=git&logoColor=4d179a&labelColor=%23eee)
+![Version](https://img.shields.io/badge/Version-0.0.0__commit8-4d179a?style=for-the-badge&logo=git&logoColor=4d179a&labelColor=%23eee)
 ![License](https://img.shields.io/badge/License-GNU-4d179a?style=for-the-badge&logo=gnu&logoColor=4d179a&labelColor=%23eee)
 ![Electron](https://img.shields.io/badge/Electron-23.6.9-4d179a?style=for-the-badge&logo=electron&logoColor=4d179a&labelColor=%23eee)
 ![React](https://img.shields.io/badge/React-18.2.0-4d179a?style=for-the-badge&logo=react&logoColor=4d179a&labelColor=%23eee)

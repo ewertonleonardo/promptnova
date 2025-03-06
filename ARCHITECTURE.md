@@ -463,40 +463,69 @@ const floatingWindow = windowManager.createFloatingWindow();
 windowManager.setWindowAlwaysOnTop(floatingWindow, true);
 ```
 
-### SearchBar Enhancement
+### SearchBar Component
 
-Provides advanced search capabilities for finding and filtering prompts.
+Provides an advanced search interface with real-time filtering and result display.
 
-**Purpose**: Enables users to quickly locate prompts and templates through real-time search with advanced filtering.
+**Purpose**: Enables users to efficiently search and filter prompts with a modern, responsive interface that supports advanced filtering capabilities.
 
 **Features**:
-- Connection to prompt database for real-time results
-- Advanced filtering options (tags, categories, date)
-- Typeahead suggestions
-- Search history tracking
+- Real-time search with debouncing
+- Advanced filtering by categories and tags
+- Dynamic result display with prompt details
+- Dark mode support
+- Loading state indication
+- Outside click handling
+- Filter state management
 
 **Files**:
-- `/src/components/navigation/SearchBar.jsx`: Main component implementation
+- `/src/components/ui/SearchBar.tsx`: Main component implementation
+- `/src/shared/services/SearchService.ts`: Search service implementation
+
+**Implementation Details**:
+- Uses React hooks for state management
+- Implements TypeScript interfaces for type safety
+- Integrates with SearchService for data operations
+- Supports customization through props
+- Handles keyboard interactions and accessibility
 
 **Usage**:
 
 ```typescript
-// Use the enhanced search bar
-import { SearchBar } from '@/components/navigation/SearchBar';
+import { SearchBar } from '@/components/ui/SearchBar';
 
 <SearchBar
-  onSearch={handleSearch}
-  filters={{
-    tags: ['productivity', 'coding'],
-    categories: ['templates']
-  }}
+  onResultSelect={(prompt) => handlePromptSelect(prompt)}
   placeholder="Search prompts..."
+  className="w-full max-w-xl"
+  autoFocus={true}
 />
 
-// Handle search results
-const handleSearch = (results, query) => {
-  console.log(`Found ${results.length} results for "${query}"`);
+// Handle prompt selection
+const handlePromptSelect = (prompt) => {
+  console.log('Selected prompt:', prompt.title);
+  // Process the selected prompt
 };
+```
+
+### SearchService Integration
+
+Provides the backend functionality for the SearchBar component.
+
+**Purpose**: Manages prompt data retrieval, filtering, and real-time search operations.
+
+**Features**:
+- Asynchronous initialization
+- Debounced search operations
+- Category and tag filtering
+- Result limiting
+- Error handling
+
+**Implementation Details**:
+- Maintains an in-memory cache of prompts
+- Uses IPC communication for data retrieval
+- Implements efficient filtering algorithms
+- Provides utility methods for metadata
 ```
 
 ## Code Processing System
