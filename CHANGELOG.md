@@ -7,9 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Step 8**: Implemented CRUD operations for prompt management:
+  - Created PromptEditor component for creating and editing prompts
+  - Developed PromptCategories component for organizing prompts by category
+  - Implemented usePrompts hook for centralized prompt state management
+  - Added functionality for creating, reading, updating, and deleting prompts
+
 ### Planned
 
-- **Step 8**: Implement CRUD operations for prompt management, allowing users to create, read, update, and delete prompts.
 - **Step 9**: Integrate a placeholder system for detecting and managing placeholders within prompts.
 - **Step 10**: Add file system integration features, such as drag-and-drop and file previews, to enhance user interaction.
 - **Step 11**: Develop workspace management features, enabling users to select and configure workspaces.

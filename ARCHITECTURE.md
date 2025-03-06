@@ -768,3 +768,125 @@ const preview = new CodePreview({
 // Set content
 preview.setContent(codeSnippet);
 ```
+
+## Prompt Management Components
+
+PromptNova implements a comprehensive prompt management system for creating, editing, organizing, and using prompts:
+
+### PromptEditor Component
+
+Provides an interface for creating and editing prompts with real-time preview.
+
+**Purpose**: Enables users to create, edit, and format prompts with support for placeholders, markdown, and code snippets.
+
+**Features**:
+- Rich text editing with markdown support
+- Placeholder detection and management
+- Real-time preview of formatted content
+- Tag and category assignment
+- Validation and error handling
+
+**Files**:
+- `/src/renderer/components/prompt/PromptEditor.tsx`: Main component implementation
+
+**Usage**:
+
+```typescript
+import { PromptEditor } from '@/renderer/components/prompt/PromptEditor';
+
+// Create a new prompt
+<PromptEditor 
+  onSave={(promptData) => savePrompt(promptData)}
+  initialData={{
+    title: "",
+    content: "",
+    tags: [],
+    categoryId: "default"
+  }}
+/>
+
+// Edit an existing prompt
+<PromptEditor 
+  onSave={(promptData) => updatePrompt(promptId, promptData)}
+  initialData={existingPrompt}
+/>
+```
+
+### PromptCategories Component
+
+Manages the organization of prompts into categories for better organization.
+
+**Purpose**: Provides an interface for creating, editing, and managing prompt categories to organize the prompt library.
+
+**Features**:
+- Category creation and editing
+- Drag-and-drop organization
+- Nested category support
+- Category color coding
+- Prompt assignment to categories
+
+**Files**:
+- `/src/renderer/components/prompt/PromptCategories.tsx`: Main component implementation
+
+**Usage**:
+
+```typescript
+import { PromptCategories } from '@/renderer/components/prompt/PromptCategories';
+
+// Display categories with selection
+<PromptCategories
+  onCategorySelect={(categoryId) => setSelectedCategory(categoryId)}
+  onCategoryUpdate={(categoryId, data) => updateCategory(categoryId, data)}
+  onCategoryCreate={(data) => createCategory(data)}
+/>
+```
+
+### usePrompts Hook
+
+Provides a centralized way to manage prompts throughout the application.
+
+**Purpose**: Offers a React hook for accessing and manipulating prompts with built-in state management and persistence.
+
+**Features**:
+- CRUD operations for prompts
+- Filtering and searching
+- Category-based organization
+- Persistence through IPC communication
+- Real-time updates across components
+
+**Files**:
+- `/src/renderer/hooks/usePrompts.ts`: Hook implementation
+
+**Usage**:
+
+```typescript
+import { usePrompts } from '@/renderer/hooks/usePrompts';
+
+// In a component
+const { 
+  prompts,
+  getPromptById,
+  createPrompt,
+  updatePrompt,
+  deletePrompt,
+  getPromptsByCategory,
+  searchPrompts
+} = usePrompts();
+
+// Create a new prompt
+const newPromptId = await createPrompt({
+  title: "API Request Template",
+  content: "GET {{endpoint}} HTTP/1.1\nAuthorization: Bearer {{token}}",
+  tags: ["api", "http"],
+  categoryId: "web-development"
+});
+
+// Update an existing prompt
+await updatePrompt(promptId, { title: "Updated Title" });
+
+// Get prompts by category
+const categoryPrompts = getPromptsByCategory("web-development");
+
+// Search prompts
+const searchResults = await searchPrompts("api");
+```
