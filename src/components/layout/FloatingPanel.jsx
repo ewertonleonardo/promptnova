@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import { debounce } from 'lodash';
 
 /**
  * FloatingPanel component for creating a draggable, resizable floating window
@@ -19,17 +20,56 @@ const FloatingPanel = ({
   isOpen = true,
   onClose,
   initialPosition = { x: 100, y: 100 },
-  minSize = { width: 300, height: 200 }
+  minSize = { width: 300, height: 200 },
+  maxSize = { width: 800, height: 600 }
 }) => {
-  const [position, setPosition] = useState(initialPosition);
+  const [position, setPosition] = useState(() => {
+    const savedPosition = localStorage.getItem('floatingPanelPosition');
+    return savedPosition ? JSON.parse(savedPosition) : initialPosition;
+  });
+  const [size, setSize] = useState(() => {
+    const savedSize = localStorage.getItem('floatingPanelSize');
+    return savedSize ? JSON.parse(savedSize) : minSize;
+  });
+  const [isResizing, setIsResizing] = useState(false);
+  const resizeStartPos = useRef({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const panelRef = useRef(null);
+
+  const savePositionToStorage = useCallback(
+    debounce((pos) => {
+      localStorage.setItem('floatingPanelPosition', JSON.stringify(pos));
+    }, 100),
+    []
+  );
+
+  const saveSizeToStorage = useCallback(
+    debounce((newSize) => {
+      localStorage.setItem('floatingPanelSize', JSON.stringify(newSize));
+    }, 100),
+    []
+  );
 
   useEffect(() => {
     if (!isOpen) return;
 
     const handleMouseMove = (e) => {
+      if (isResizing && panelRef.current) {
+        const deltaX = e.clientX - resizeStartPos.current.x;
+        const deltaY = e.clientY - resizeStartPos.current.y;
+        
+        const newWidth = Math.min(maxSize.width, Math.max(minSize.width, size.width + deltaX));
+        const newHeight = Math.min(maxSize.height, Math.max(minSize.height, size.height + deltaY));
+        
+        setSize({ width: newWidth, height: newHeight });
+        saveSizeToStorage({ width: newWidth, height: newHeight });
+        
+        resizeStartPos.current = { x: e.clientX, y: e.clientY };
+        return;
+      }
+
+
       if (isDragging && panelRef.current) {
         const newX = e.clientX - dragOffset.x;
         const newY = e.clientY - dragOffset.y;
@@ -47,6 +87,7 @@ const FloatingPanel = ({
 
     const handleMouseUp = () => {
       setIsDragging(false);
+      setIsResizing(false);
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -56,7 +97,7 @@ const FloatingPanel = ({
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, dragOffset, isOpen]);
+  }, [isDragging, isResizing, dragOffset, isOpen, size.width, size.height, minSize, maxSize, saveSizeToStorage]);
 
   const handleMouseDown = (e) => {
     if (panelRef.current) {
@@ -68,6 +109,16 @@ const FloatingPanel = ({
     }
   };
 
+  useEffect(() => {
+    savePositionToStorage(position);
+  }, [position, savePositionToStorage]);
+
+  const handleResizeStart = (e) => {
+    e.preventDefault();
+    setIsResizing(true);
+    resizeStartPos.current = { x: e.clientX, y: e.clientY };
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -77,8 +128,12 @@ const FloatingPanel = ({
       style={{
         left: position.x,
         top: position.y,
+        width: size.width,
+        height: size.height,
         minWidth: minSize.width,
         minHeight: minSize.height,
+        maxWidth: maxSize.width,
+        maxHeight: maxSize.height,
         zIndex: 9999
       }}
     >
@@ -106,6 +161,14 @@ const FloatingPanel = ({
         )}
       </div>
       <div className="p-4">{children}</div>
+      <div
+        className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize"
+        onMouseDown={handleResizeStart}
+        style={{
+          background: 'transparent',
+          transform: 'translate(50%, 50%)',
+        }}
+      />
     </div>
   );
 };
@@ -118,6 +181,10 @@ FloatingPanel.propTypes = {
   initialPosition: PropTypes.shape({
     x: PropTypes.number,
     y: PropTypes.number
+  }),
+  maxSize: PropTypes.shape({
+    width: PropTypes.number,
+    height: PropTypes.number
   }),
   minSize: PropTypes.shape({
     width: PropTypes.number,

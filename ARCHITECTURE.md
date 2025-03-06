@@ -384,6 +384,121 @@ console.log(workspace.state.visibleSections);
 
 ```
 
+## UI Component System
+
+PromptNova implements a modern UI component system for creating an intuitive and efficient user interface:
+
+### FloatingPanel Component
+
+Provides a flexible, movable interface container that can be positioned anywhere on screen.
+
+**Purpose**: Creates a foundation for floating windows that can be resized, moved, and remembered between sessions.
+
+**Features**:
+- Size constraints with minimum and maximum dimensions
+- Position memory for restoring window placement
+- Performance optimizations for smooth animations
+- Drag handles for user repositioning
+
+**Files**:
+- `/src/components/layout/FloatingPanel.jsx`: Main component implementation
+
+**Usage**:
+
+```typescript
+// Create a floating panel with position memory
+import { FloatingPanel } from '@/components/layout/FloatingPanel';
+
+<FloatingPanel
+  id="prompt-panel"
+  defaultPosition={{ x: 100, y: 100 }}
+  minWidth={300}
+  minHeight={200}
+>
+  {/* Panel content */}
+</FloatingPanel>
+```
+
+### WindowManager Integration
+
+Integrates with Electron to provide native window management capabilities.
+
+**Purpose**: Bridges the gap between React components and Electron's window management, enabling advanced window behaviors.
+
+**Features**:
+- Complete Electron integration for native window controls
+- Stay-on-top functionality for floating windows
+- Window state management (position, size, visibility)
+- Multi-window coordination
+
+**Files**:
+- `/src/components/layout/WindowManager.jsx`: Electron integration layer
+- `/src/main/managers/WindowManager.ts`: Main process window management
+
+**Usage**:
+
+```typescript
+// In renderer process
+import { useWindowManager } from '@/components/layout/WindowManager';
+
+const { setAlwaysOnTop, setWindowState } = useWindowManager();
+
+// Set window to stay on top
+setAlwaysOnTop(true);
+
+// Save window state
+setWindowState({
+  position: { x: 100, y: 100 },
+  size: { width: 400, height: 300 },
+  isVisible: true
+});
+
+// In main process
+import { windowManager } from '@/main/managers/WindowManager';
+
+// Create a floating window
+const floatingWindow = windowManager.createFloatingWindow();
+
+// Set window properties
+windowManager.setWindowAlwaysOnTop(floatingWindow, true);
+```
+
+### SearchBar Enhancement
+
+Provides advanced search capabilities for finding and filtering prompts.
+
+**Purpose**: Enables users to quickly locate prompts and templates through real-time search with advanced filtering.
+
+**Features**:
+- Connection to prompt database for real-time results
+- Advanced filtering options (tags, categories, date)
+- Typeahead suggestions
+- Search history tracking
+
+**Files**:
+- `/src/components/navigation/SearchBar.jsx`: Main component implementation
+
+**Usage**:
+
+```typescript
+// Use the enhanced search bar
+import { SearchBar } from '@/components/navigation/SearchBar';
+
+<SearchBar
+  onSearch={handleSearch}
+  filters={{
+    tags: ['productivity', 'coding'],
+    categories: ['templates']
+  }}
+  placeholder="Search prompts..."
+/>
+
+// Handle search results
+const handleSearch = (results, query) => {
+  console.log(`Found ${results.length} results for "${query}"`);
+};
+```
+
 ## Code Processing System
 
 PromptNova implements a code processing system to handle various programming languages and code transformations:
