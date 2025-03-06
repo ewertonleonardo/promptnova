@@ -11,13 +11,66 @@ import { BrowserWindow, screen, app } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 
+interface WindowState {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  isMaximized: boolean;
+  isAlwaysOnTop: boolean;
+}
+
 export class WindowManager {
   private mainWindow: BrowserWindow | null = null;
   private floatingWindow: BrowserWindow | null = null;
   private isDevelopment: boolean;
+  private windowStates: Map<string, WindowState> = new Map();
 
   constructor() {
     this.isDevelopment = process.env.NODE_ENV === 'development';
+    this.loadWindowStates();
+  }
+
+  /**
+   * Loads saved window states from storage
+   */
+  private loadWindowStates(): void {
+    try {
+      const savedStates = app.getPath('userData');
+      const states = require(path.join(savedStates, 'window-states.json'));
+      Object.entries(states).forEach(([key, state]) => {
+        this.windowStates.set(key, state as WindowState);
+      });
+    } catch (error) {
+      console.log('No saved window states found');
+    }
+  }
+
+  /**
+   * Saves current window states to storage
+   */
+  private saveWindowStates(): void {
+    const states = Object.fromEntries(this.windowStates.entries());
+    const savedStates = app.getPath('userData');
+    require('fs').writeFileSync(
+      path.join(savedStates, 'window-states.json'),
+      JSON.stringify(states, null, 2)
+    );
+  }
+
+  /**
+   * Updates the state of a window
+   * @param windowId - The identifier of the window
+   * @param window - The window instance
+   */
+  private updateWindowState(windowId: string, window: BrowserWindow): void {
+    const bounds = window.getBounds();
+    this.windowStates.set(windowId, {
+      ...bounds,
+      isMaximized: window.isMaximized(),
+      isAlwaysOnTop: window.isAlwaysOnTop()
+    });
+    this.saveWindowStates();
   }
 
   /**
@@ -25,6 +78,7 @@ export class WindowManager {
    * @returns BrowserWindow - The created main window
    */
   public createMainWindow(): BrowserWindow {
+    const savedState = this.windowStates.get('main');
     // Close existing window if it exists
     if (this.mainWindow) {
       this.mainWindow.close();
@@ -33,8 +87,10 @@ export class WindowManager {
 
     // Create the browser window with appropriate settings
     this.mainWindow = new BrowserWindow({
-      width: 1200,
-      height: 800,
+      width: savedState?.width || 1200,
+      height: savedState?.height || 800,
+      x: savedState?.x,
+      y: savedState?.y,
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
@@ -63,8 +119,34 @@ export class WindowManager {
       );
     }
 
+    // Restore maximized state if needed
+    if (savedState?.isMaximized) {
+      this.mainWindow.maximize();
+    }
+
+    // Set always on top if previously enabled
+    if (savedState?.isAlwaysOnTop) {
+      this.mainWindow.setAlwaysOnTop(true);
+    }
+
+    // Save window state on changes
+    this.mainWindow.on('resize', () => {
+      if (this.mainWindow) {
+        this.updateWindowState('main', this.mainWindow);
+      }
+    });
+
+    this.mainWindow.on('move', () => {
+      if (this.mainWindow) {
+        this.updateWindowState('main', this.mainWindow);
+      }
+    });
+
     // Handle window closed event
     this.mainWindow.on('closed', () => {
+      if (this.mainWindow) {
+        this.updateWindowState('main', this.mainWindow);
+      }
       // Dereference the window object
       this.mainWindow = null;
     });
@@ -77,22 +159,23 @@ export class WindowManager {
    * @returns BrowserWindow - The created floating window
    */
   public createFloatingWindow(): BrowserWindow {
+    const savedState = this.windowStates.get('floating');
     // Close existing window if it exists
     if (this.floatingWindow) {
       this.floatingWindow.close();
       this.floatingWindow = null;
     }
 
-    // Get the cursor position to place the window near it
-    const cursorPosition = screen.getCursorScreenPoint();
-    const displayBounds = screen.getDisplayNearestPoint(cursorPosition).workArea;
+    // Use saved position or get cursor position
+    const position = savedState ? { x: savedState.x, y: savedState.y } : screen.getCursorScreenPoint();
+    const displayBounds = screen.getDisplayNearestPoint(position).workArea;
 
     // Create the floating window with appropriate settings
     this.floatingWindow = new BrowserWindow({
-      width: 500,
-      height: 400,
-      x: cursorPosition.x,
-      y: cursorPosition.y,
+      width: savedState?.width || 500,
+      height: savedState?.height || 400,
+      x: position.x,
+      y: position.y,
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
@@ -130,8 +213,24 @@ export class WindowManager {
       }
     });
 
+    // Save window state on changes
+    this.floatingWindow.on('resize', () => {
+      if (this.floatingWindow) {
+        this.updateWindowState('floating', this.floatingWindow);
+      }
+    });
+
+    this.floatingWindow.on('move', () => {
+      if (this.floatingWindow) {
+        this.updateWindowState('floating', this.floatingWindow);
+      }
+    });
+
     // Handle window closed event
     this.floatingWindow.on('closed', () => {
+      if (this.floatingWindow) {
+        this.updateWindowState('floating', this.floatingWindow);
+      }
       this.floatingWindow = null;
     });
 
