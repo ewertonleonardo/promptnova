@@ -8,8 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- **Step 10**: Add file system integration features, such as drag-and-drop and file previews, to enhance user interaction.
-- **Step 11**: Develop workspace management features, enabling users to select and configure workspaces.
+
 - **Step 13**: Add support for importing and exporting prompts, including utilities and UI components.
 - **Step 14**: Implement advanced code processing features, including comment removal and processing options.
 - **Step 15**: Ensure the application is accessible by adding accessibility components, hooks, and styles.
@@ -17,6 +16,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Step 17**: Set up build and distribution configurations, including CI/CD workflows, to automate the deployment process.
 - **Step 18**: Add error tracking and recovery mechanisms to enhance application stability and user experience.
 - **Step 19**: Configure Git hooks and enforce project rules to maintain version control compliance and code quality.
+
+### Added
+
+- **Step 11**: Implemented workspace management features for organizing and configuring multiple prompt environments:
+  - Created WorkspaceSelector component for intuitive workspace switching
+  - Developed WorkspaceSettings component for configuring workspace preferences
+  - Implemented useWorkspace hook for centralized workspace state management
+  - Added support for creating, selecting, and managing multiple workspaces
+  - Integrated workspace-specific prompt collections and settings
+  - Implemented persistent storage for workspace configurations
+
+- **Step 10**: Add file system integration features, such as drag-and-drop and file previews, to enhance user interaction.
+
+- File system integration features implementation:
+  - FileDropZone component for drag-and-drop file uploads
+  - FilePreview component for displaying file contents before processing
+  - File processing utilities for handling different file types
+  - Drag-and-drop interface with visual feedback
+  - File type validation and size limit enforcement
 
 ## [0.0.0_commit10] - 2024-03-06
 

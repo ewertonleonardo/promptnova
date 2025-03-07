@@ -8,6 +8,7 @@
 import { ipcMain } from 'electron';
 import { registerPromptHandlers } from './prompt';
 import { registerWorkspaceHandlers } from './workspace';
+import { registerImportExportHandlers } from './importExport';
 import { IPC_CHANNELS, IPCResponse } from '../../shared/ipc-types';
 
 /**
@@ -20,6 +21,7 @@ export function registerIpcHandlers(): void {
   // Register specific handler groups
   registerPromptHandlers();
   registerWorkspaceHandlers();
+  registerImportExportHandlers();
   
   // Register general application handlers
   registerGeneralHandlers();

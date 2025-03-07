@@ -117,7 +117,7 @@
 
 ## Context Code Integration
 
-- [ ] Step 10: Implement File System Integration
+- [X] Step 10: Implement File System Integration
   - **Task**: Add drag & drop and file system integration features
   - **Files**:
     - `/src/renderer/components/context/FileDropZone.tsx`: File drop zone component
@@ -128,7 +128,7 @@
 
 ## Workspace Management
 
-- [ ] Step 11: Implement Workspace Features
+- [X] Step 11: Implement Workspace Features
   - **Task**: Add workspace management functionality
   - **Files**:
     - `/src/renderer/components/workspace/WorkspaceSelector.tsx`: Workspace selection UI

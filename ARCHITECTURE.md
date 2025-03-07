@@ -80,21 +80,100 @@ const mainWindow = windowManager.createMainWindow();
 windowManager.toggleFloatingWindow(true); // Show
 windowManager.toggleFloatingWindow(false); // Hide
 ```
+## File System Integration Components
 
-### FileSystemManager
+PromptNova implements a robust file system integration system to enable drag & drop functionality and file preview capabilities:
 
-Provides an interface for file system operations.
+### FileDropZone Component
 
-**Purpose**: Handles reading and writing files, managing workspaces, and importing/exporting prompts.
+Provides a flexible drag and drop interface for file selection.
+
+**Purpose**: Enables users to easily add files to the application through an intuitive drag and drop interface or file selection dialog.
+
+**Features**:
+- Drag and drop file selection
+- Click to open file browser alternative
+- File type filtering with accepted file types
+- Multiple file selection with optional limits
+- Visual feedback during drag operations
+- Rejection handling for invalid files
+
+**Files**:
+- `/src/renderer/components/context/FileDropZone.tsx`: Main component implementation
 
 **Usage**:
 
 ```typescript
-// Save a prompt to the file system
-fileSystemManager.savePrompt(promptData);
+import { FileDropZone } from '@/renderer/components/context/FileDropZone';
 
-// Export prompts to a file
-fileSystemManager.exportPrompts(prompts, filePath);
+<FileDropZone
+  onFilesSelected={(files) => handleFiles(files)}
+  acceptedFileTypes={['.js', '.ts', '.jsx', '.tsx']}
+  maxFiles={5}
+  className="w-full h-32"
+/>
+```
+
+### FilePreview Component
+
+Displays previews of selected files with appropriate icons and metadata.
+
+**Purpose**: Provides visual feedback about selected files and allows users to preview file contents when possible.
+
+**Features**:
+- File type detection with appropriate icons
+- Preview generation for supported file types (images, text)
+- File metadata display (name, size, type)
+- Remove button for deleting files from selection
+- Error handling for large or unsupported files
+
+**Files**:
+- `/src/renderer/components/context/FilePreview.tsx`: Main component implementation
+
+**Usage**:
+
+```typescript
+import { FilePreview } from '@/renderer/components/context/FilePreview';
+
+<FilePreview
+  file={selectedFile}
+  onRemove={() => handleRemoveFile(selectedFile)}
+  maxPreviewSize={2 * 1024 * 1024} // 2MB
+  className="border rounded p-3"
+/>
+```
+
+### File Processing Utilities
+
+Provides utility functions for handling file operations and processing.
+
+**Purpose**: Centralizes common file operations like validation, reading, and processing to ensure consistent behavior throughout the application.
+
+**Features**:
+- File validation against size and type constraints
+- Text file reading with error handling
+- Support for various programming language file types
+- File size formatting
+- Error type definitions for consistent error handling
+
+**Files**:
+- `/src/shared/utils/fileProcessing.ts`: Core file processing utilities
+
+**Usage**:
+
+```typescript
+import { validateFile, readTextFile, SUPPORTED_TEXT_TYPES } from '@/shared/utils/fileProcessing';
+
+// Validate a file
+const validation = validateFile(file, 5 * 1024 * 1024, SUPPORTED_TEXT_TYPES);
+if (validation.isValid) {
+  // Process the file
+  const content = await readTextFile(file);
+  // Use the file content
+} else {
+  // Handle validation error
+  console.error(validation.message);
+}
 ```
 
 ### ClipboardManager
@@ -117,7 +196,6 @@ if (clipboardManager.hasText()) {
   // Process clipboard content
 }
 ```
-
 ## Data Models and Storage System
 
 PromptNova implements a robust data model system for managing prompts and workspaces:
@@ -426,6 +504,109 @@ workspaceManager.deleteWorkspace(workspaceId);
 
 // Get available workspace templates
 const templates = workspaceManager.getTemplates();
+```
+
+### WorkspaceSelector Component
+
+Provides a user interface for selecting and switching between workspaces.
+
+**Purpose**: Enables users to easily navigate between different workspaces and manage their workspace selection.
+
+**Features**:
+
+- List of available workspaces
+- Quick workspace switching
+- Visual indicators for active workspace
+- Search and filter capabilities
+- Recent workspaces history
+
+**Files**:
+
+- `/src/renderer/components/workspace/WorkspaceSelector.tsx`: Main component implementation
+
+**Usage**:
+
+```typescript
+import { WorkspaceSelector } from '@/renderer/components/workspace/WorkspaceSelector';
+
+<WorkspaceSelector
+  onWorkspaceSelect={handleWorkspaceSelect}
+  currentWorkspace={currentWorkspace}
+  recentWorkspaces={recentWorkspaces}
+/>
+```
+
+### WorkspaceSettings Component
+
+Manages workspace-specific configuration and settings.
+
+**Purpose**: Provides an interface for users to configure workspace-specific settings and preferences.
+
+**Features**:
+
+- Workspace name and description editing
+- Category management
+- Template preferences
+- Export/import settings
+- Workspace-specific shortcuts
+
+**Files**:
+
+- `/src/renderer/components/workspace/WorkspaceSettings.tsx`: Main component implementation
+
+**Usage**:
+
+```typescript
+import { WorkspaceSettings } from '@/renderer/components/workspace/WorkspaceSettings';
+
+<WorkspaceSettings
+  workspace={currentWorkspace}
+  onSettingsUpdate={handleSettingsUpdate}
+  onExportWorkspace={handleExport}
+/>
+```
+
+### useWorkspace Hook
+
+Custom React hook for managing workspace state and operations.
+
+**Purpose**: Provides a convenient way to access and manage workspace data and operations within React components.
+
+**Features**:
+
+- Workspace state management
+- CRUD operations for workspace data
+- Automatic state updates
+- Error handling
+- Loading state management
+
+**Files**:
+
+- `/src/renderer/hooks/useWorkspace.ts`: Custom React hook implementation
+
+**Usage**:
+
+```typescript
+import { useWorkspace } from '@/renderer/hooks/useWorkspace';
+
+const {
+  workspace,
+  isLoading,
+  error,
+  updateWorkspace,
+  deleteWorkspace,
+  exportWorkspace
+} = useWorkspace(workspaceId);
+
+// Update workspace settings
+await updateWorkspace({
+  name: 'Updated Name',
+  description: 'New description'
+});
+
+// Export workspace data
+const exportData = await exportWorkspace();
+```
 ```
 
 ### Enhanced SectionProvider
