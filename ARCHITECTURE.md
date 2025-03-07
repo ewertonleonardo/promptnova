@@ -1,3 +1,49 @@
+# Project Structure
+
+PromptNova follows a well-organized directory structure to maintain clean separation of concerns and facilitate easy navigation:
+
+## Source Code (`/src`)
+
+### Main Process (`/src/main`)
+- `index.ts`: Entry point for Electron's main process
+- `/ipc`: IPC handlers for inter-process communication
+- `/managers`: Core system managers (ShortcutManager, WindowManager, etc.)
+- `/plugins`: Plugin system infrastructure
+- `/storage`: Data persistence and storage implementations
+
+### Renderer Process (`/src/renderer`)
+- `index.tsx`: Entry point for React renderer process
+- `/components`: React UI components
+- `/hooks`: Custom React hooks
+- `/styles`: CSS and styling files
+- `/utils`: Utility functions for the renderer
+
+### Shared (`/src/shared`)
+- `/models`: Data models (Prompt, Workspace)
+- `/utils`: Shared utility functions
+- `/services`: Shared service implementations
+- `ipc-types.ts`: TypeScript definitions for IPC messages
+
+## Configuration Files
+
+- `package.json`: Project dependencies and scripts
+- `tsconfig.json`: TypeScript configuration
+- `.eslintrc.js`: ESLint rules
+- `.prettierrc`: Code formatting rules
+- `jest.config.js`: Testing configuration
+- `tailwind.config.js`: Tailwind CSS configuration
+
+## Build Configuration (`/build`)
+
+- `electron-builder.yml`: Electron build settings
+- `webpack.config.js`: Webpack bundling configuration
+
+## Documentation
+
+- `ARCHITECTURE.md`: System architecture documentation
+- `README.md`: Project overview and setup instructions
+- `CHANGELOG.md`: Version history and changes
+
 ## Core System Managers
 
 PromptNova uses several manager classes to handle core system functionality:
@@ -173,6 +219,100 @@ ipcMain.handle(IPCChannels.SAVE_PROMPT, async (event, promptData) => {
   // Process the request and return the result
   return await savePromptToStorage(promptData);
 });
+```
+
+## Placeholder System
+
+PromptNova implements a robust placeholder system for creating dynamic prompts with user-fillable fields:
+
+### Placeholder Detection Utilities
+
+Provides utilities for detecting, validating, and replacing placeholders in prompt content.
+
+**Purpose**: Enables the identification and processing of dynamic placeholders in prompt templates, allowing for customizable prompt generation.
+
+**Features**:
+- Regular expression-based placeholder detection
+- Validation of placeholder format and naming
+- Placeholder replacement with user-provided values
+- Default value support for optional placeholders
+
+**Files**:
+- `/src/shared/utils/placeholder.ts`: Core placeholder utilities
+
+**Usage**:
+
+```typescript
+// Detect placeholders in a prompt string
+const placeholders = detectPlaceholders("This is a {{placeholder}} with {{another_one}}");
+
+// Validate a placeholder name
+const isValid = validatePlaceholderName("my_placeholder");
+
+// Replace placeholders with values
+const filledPrompt = replacePlaceholders(promptText, {
+  placeholder: "value",
+  another_one: "second value"
+});
+```
+
+### PlaceholderEditor Component
+
+Provides a user interface for editing and managing placeholders in prompts.
+
+**Purpose**: Allows users to create, edit, and manage placeholders within the prompt editing interface.
+
+**Features**:
+- Visual highlighting of placeholders in the editor
+- Inline placeholder creation and editing
+- Default value configuration
+- Placeholder validation feedback
+
+**Files**:
+- `/src/renderer/components/prompt/PlaceholderEditor.tsx`: UI component for placeholder editing
+
+**Usage**:
+
+```typescript
+// Render the placeholder editor component
+<PlaceholderEditor
+  promptContent={promptContent}
+  onChange={handleContentChange}
+  onPlaceholderUpdate={handlePlaceholderUpdate}
+/>
+```
+
+### usePlaceholders Hook
+
+Manages placeholder state and operations in React components.
+
+**Purpose**: Provides a React hook for managing placeholder detection, validation, and replacement within components.
+
+**Features**:
+- Automatic placeholder detection in prompt content
+- State management for placeholder values
+- Validation of user-provided values
+- Integration with form components
+
+**Files**:
+- `/src/renderer/hooks/usePlaceholders.ts`: Custom React hook
+
+**Usage**:
+
+```typescript
+// Use the hook in a component
+const {
+  placeholders,
+  placeholderValues,
+  updatePlaceholderValue,
+  fillPromptWithValues
+} = usePlaceholders(promptContent);
+
+// Update a placeholder value
+updatePlaceholderValue('user_name', 'John');
+
+// Get the filled prompt with all values
+const finalPrompt = fillPromptWithValues();
 ```
 
 ## Changelog

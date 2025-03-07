@@ -7,17 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- **Step 8**: Implemented CRUD operations for prompt management:
-  - Created PromptEditor component for creating and editing prompts
-  - Developed PromptCategories component for organizing prompts by category
-  - Implemented usePrompts hook for centralized prompt state management
-  - Added functionality for creating, reading, updating, and deleting prompts
-
 ### Planned
-
-- **Step 9**: Integrate a placeholder system for detecting and managing placeholders within prompts.
 - **Step 10**: Add file system integration features, such as drag-and-drop and file previews, to enhance user interaction.
 - **Step 11**: Develop workspace management features, enabling users to select and configure workspaces.
 - **Step 13**: Add support for importing and exporting prompts, including utilities and UI components.
@@ -28,9 +18,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Step 18**: Add error tracking and recovery mechanisms to enhance application stability and user experience.
 - **Step 19**: Configure Git hooks and enforce project rules to maintain version control compliance and code quality.
 
+## [0.0.0_commit10] - 2024-03-06
+
+### Added
+
+- **Step 9**: Implemented placeholder system for detecting and managing placeholders within prompts:
+  - Created placeholder detection and extraction utilities in `placeholder.ts`
+  - Developed PlaceholderEditor component for editing placeholder values
+  - Implemented usePlaceholders hook for centralized placeholder management
+  - Added support for placeholder validation, formatting, and value replacement
+
+## [0.0.0_commit9] - 2024-03-06
+
+### Added
+
+- **Step 8**: Implemented CRUD operations for prompt management:
+  - Created PromptEditor component for creating and editing prompts
+  - Developed PromptCategories component for organizing prompts by category
+  - Implemented usePrompts hook for centralized prompt state management
+  - Added functionality for creating, reading, updating, and deleting prompts
+
 ## [0.0.0_commit8] - 2024-03-06
 
-- **Step 7**: Adapt template components for a floating interface, including search and window management.
+> **Step 7**: Adapt template components for a floating interface, including search and window management.
 
 ### Added
 

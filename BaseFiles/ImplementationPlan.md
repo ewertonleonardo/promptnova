@@ -97,7 +97,7 @@
 
 ## Prompt Management Features
 
-- [ ] Step 8: Implement Prompt CRUD Operations
+- [X] Step 8: Implement Prompt CRUD Operations
   - **Task**: Create components and handlers for prompt management
   - **Files**:
     - `/src/renderer/components/prompt/PromptEditor.tsx`: Prompt editing interface
@@ -106,7 +106,7 @@
   - **Step Dependencies**: Steps 5, 7
   - **User Instructions**: None
 
-- [ ] Step 9: Add Placeholder System
+- [X] Step 9: Add Placeholder System
   - **Task**: Implement placeholder detection and management
   - **Files**:
     - `/src/shared/utils/placeholder.ts`: Placeholder detection utilities
