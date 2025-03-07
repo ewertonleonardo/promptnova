@@ -1,0 +1,8 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Run lint-staged to lint and format files that are staged for commit
+npx lint-staged
+
+# Validate commit message format using commitlint
+npx --no -- commitlint --edit $1

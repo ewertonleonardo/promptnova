@@ -5,6 +5,7 @@ PromptNova follows a well-organized directory structure to maintain clean separa
 ## Source Code (`/src`)
 
 ### Main Process (`/src/main`)
+
 - `index.ts`: Entry point for Electron's main process
 - `/ipc`: IPC handlers for inter-process communication
 - `/managers`: Core system managers (ShortcutManager, WindowManager, etc.)
@@ -12,6 +13,7 @@ PromptNova follows a well-organized directory structure to maintain clean separa
 - `/storage`: Data persistence and storage implementations
 
 ### Renderer Process (`/src/renderer`)
+
 - `index.tsx`: Entry point for React renderer process
 - `/components`: React UI components
 - `/hooks`: Custom React hooks
@@ -19,10 +21,14 @@ PromptNova follows a well-organized directory structure to maintain clean separa
 - `/utils`: Utility functions for the renderer
 
 ### Shared (`/src/shared`)
+
 - `/models`: Data models (Prompt, Workspace)
 - `/utils`: Shared utility functions
+  - `commentStripping.ts`: Language-aware comment removal utilities
+  - `codeProcessing.ts`: Advanced code transformation utilities
 - `/services`: Shared service implementations
 - `ipc-types.ts`: TypeScript definitions for IPC messages
+- `CodeProcessor.ts`: Core class for processing code with various options
 
 ## Configuration Files
 
@@ -35,14 +41,37 @@ PromptNova follows a well-organized directory structure to maintain clean separa
 
 ## Build Configuration (`/build`)
 
-- `electron-builder.yml`: Electron build settings
+- `electron-builder.yml`: Electron build settings for packaging the application
 - `webpack.config.js`: Webpack bundling configuration
+- `/resources`: Build resources including icons and platform-specific files
+  - `/icons`: Application icons for different platforms (Windows, macOS, Linux)
+  - `/entitlements.mac.plist`: macOS security entitlements configuration
+- `/scripts`: Build-related scripts
+  - `afterBuild.js`: Post-build operations script
+
+## Build and Distribution
+
+The application uses Electron Builder for packaging and distribution:
+
+1. Configuration in `/build/electron-builder.yml`
+2. CI/CD workflow in `/.github/workflows/build.yml`
+3. Build scripts in `/scripts/build.js`
+
+The build system supports:
+
+- Cross-platform builds (Windows, macOS, Linux)
+- Multiple distribution formats (NSIS installer, portable, DMG, AppImage, etc.)
+- Automated releases through GitHub Actions
+- Platform-specific configurations and optimizations
 
 ## Documentation
 
 - `ARCHITECTURE.md`: System architecture documentation
 - `README.md`: Project overview and setup instructions
 - `CHANGELOG.md`: Version history and changes
+- `/documentation/user/getting-started.md`: Comprehensive guide for new users covering installation, basic usage, and advanced features
+- `/documentation/developer/architecture.md`: Detailed overview of the application architecture, components, and workflows
+- `/documentation/developer/contributing.md`: Guidelines for contributing to the project, including code standards and workflow
 
 ## Core System Managers
 
@@ -80,6 +109,7 @@ const mainWindow = windowManager.createMainWindow();
 windowManager.toggleFloatingWindow(true); // Show
 windowManager.toggleFloatingWindow(false); // Hide
 ```
+
 ## File System Integration Components
 
 PromptNova implements a robust file system integration system to enable drag & drop functionality and file preview capabilities:
@@ -91,6 +121,7 @@ Provides a flexible drag and drop interface for file selection.
 **Purpose**: Enables users to easily add files to the application through an intuitive drag and drop interface or file selection dialog.
 
 **Features**:
+
 - Drag and drop file selection
 - Click to open file browser alternative
 - File type filtering with accepted file types
@@ -98,7 +129,60 @@ Provides a flexible drag and drop interface for file selection.
 - Visual feedback during drag operations
 - Rejection handling for invalid files
 
+## Import/Export System
+
+PromptNova includes a comprehensive import/export system for sharing and backing up prompts:
+
+### ImportExport Utilities
+
+**Purpose**: Provides core functionality for serializing and deserializing prompt data, with validation and error handling to ensure data integrity during import/export operations.
+
+**Features**:
+
+- Prompt data validation during import/export
+- Version compatibility checking
+- Structured error handling with detailed feedback
+- Support for workspace context in exports
+
+**Usage**:
+
+```typescript
+// Export prompts to JSON format
+const exportData = prepareExport(prompts, workspace);
+
+// Import and validate prompts from JSON
+try {
+  validateImportData(importData);
+  const processedPrompts = processImportData(importData);
+} catch (error) {
+  // Handle import errors
+}
+```
+
+### ImportExport UI Component
+
+**Purpose**: Provides a user interface for importing prompts from files and exporting prompts to files, with proper feedback and error handling.
+
+**Features**:
+
+- File selection dialogs for import/export
+- Progress indication during operations
+- Detailed error reporting with type-specific handling
+- Success confirmation with operation details
+
+### ImportExport IPC Handlers
+
+**Purpose**: Manages file system operations and communication between main and renderer processes for importing and exporting prompts.
+
+**Features**:
+
+- File dialog management for selecting import/export locations
+- File reading and writing operations
+- Error handling and reporting back to the UI
+- Integration with the main IPC system
+
 **Files**:
+
 - `/src/renderer/components/context/FileDropZone.tsx`: Main component implementation
 
 **Usage**:
@@ -121,6 +205,7 @@ Displays previews of selected files with appropriate icons and metadata.
 **Purpose**: Provides visual feedback about selected files and allows users to preview file contents when possible.
 
 **Features**:
+
 - File type detection with appropriate icons
 - Preview generation for supported file types (images, text)
 - File metadata display (name, size, type)
@@ -128,6 +213,7 @@ Displays previews of selected files with appropriate icons and metadata.
 - Error handling for large or unsupported files
 
 **Files**:
+
 - `/src/renderer/components/context/FilePreview.tsx`: Main component implementation
 
 **Usage**:
@@ -150,6 +236,7 @@ Provides utility functions for handling file operations and processing.
 **Purpose**: Centralizes common file operations like validation, reading, and processing to ensure consistent behavior throughout the application.
 
 **Features**:
+
 - File validation against size and type constraints
 - Text file reading with error handling
 - Support for various programming language file types
@@ -157,6 +244,7 @@ Provides utility functions for handling file operations and processing.
 - Error type definitions for consistent error handling
 
 **Files**:
+
 - `/src/shared/utils/fileProcessing.ts`: Core file processing utilities
 
 **Usage**:
@@ -196,6 +284,7 @@ if (clipboardManager.hasText()) {
   // Process clipboard content
 }
 ```
+
 ## Data Models and Storage System
 
 PromptNova implements a robust data model system for managing prompts and workspaces:
@@ -230,21 +319,25 @@ const errors = prompt.validate();
 const placeholders = prompt.extractPlaceholders();
 ```
 
+```md
 ### Workspace Model
 
-Organizes collections of prompts with workspace-level management.
+Organizes collections of prompts with comprehensive workspace-level management capabilities.
 
-**Purpose**: Provides a container for organizing prompts with workspace-specific metadata and operations.
+**Purpose**:
+- Provides a robust container for organizing prompts with workspace-specific metadata, operations, and configuration management.
 
 **Features**:
-
-- Validation rules for workspace properties
-- Prompt collection management
-- CRUD operations for prompts
-- JSON serialization support
+- Validation rules for workspace properties and structure
+- Complete prompt collection management with CRUD operations
+- Workspace configuration with customizable settings (theme, font size)
+- State persistence for UI elements (section visibility, scroll position)
+- Event-driven architecture for real-time synchronization
+- IPC communication between main and renderer processes
+- JSON serialization support for data portability
+- Comprehensive workspace context management
 
 **Usage**:
-
 ```typescript
 // Create a new workspace
 const workspace = new Workspace({
@@ -258,6 +351,39 @@ workspace.addPrompt(prompt);
 // Update a prompt in the workspace
 workspace.updatePrompt(promptId, { title: "Updated Title" });
 ```
+
+## Workspace Model (Additional Details)
+
+Organizes collections of prompts with workspace-level management.
+
+**Purpose**:
+
+- Provides a container for organizing prompts with workspace-specific metadata and operations.
+
+**Features**:
+
+- Workspace configuration with settings like theme and font size
+- Workspace state persistence (section visibility, scroll position)
+- Event-driven updates for real-time synchronization
+- IPC communication for main and renderer process coordination
+
+**Usage**:
+
+````typescript
+// Create a workspace context provider
+const workspaceProvider = new WorkspaceContextProvider();
+
+// Update workspace configuration
+workspaceProvider.updateWorkspaceConfig({
+  name: "Updated Workspace",
+  settings: { theme: "dark" }
+});
+
+// Access workspace state
+const workspace = await workspaceProvider.getCurrentWorkspace();
+console.log(workspace.state.visibleSections);
+```
+````
 
 ## IPC Communication System
 
@@ -310,12 +436,14 @@ Provides utilities for detecting, validating, and replacing placeholders in prom
 **Purpose**: Enables the identification and processing of dynamic placeholders in prompt templates, allowing for customizable prompt generation.
 
 **Features**:
+
 - Regular expression-based placeholder detection
 - Validation of placeholder format and naming
 - Placeholder replacement with user-provided values
 - Default value support for optional placeholders
 
 **Files**:
+
 - `/src/shared/utils/placeholder.ts`: Core placeholder utilities
 
 **Usage**:
@@ -341,12 +469,14 @@ Provides a user interface for editing and managing placeholders in prompts.
 **Purpose**: Allows users to create, edit, and manage placeholders within the prompt editing interface.
 
 **Features**:
+
 - Visual highlighting of placeholders in the editor
 - Inline placeholder creation and editing
 - Default value configuration
 - Placeholder validation feedback
 
 **Files**:
+
 - `/src/renderer/components/prompt/PlaceholderEditor.tsx`: UI component for placeholder editing
 
 **Usage**:
@@ -367,12 +497,14 @@ Manages placeholder state and operations in React components.
 **Purpose**: Provides a React hook for managing placeholder detection, validation, and replacement within components.
 
 **Features**:
+
 - Automatic placeholder detection in prompt content
 - State management for placeholder values
 - Validation of user-provided values
 - Integration with form components
 
 **Files**:
+
 - `/src/renderer/hooks/usePlaceholders.ts`: Custom React hook
 
 **Usage**:
@@ -396,6 +528,29 @@ const finalPrompt = fillPromptWithValues();
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for all notable changes.
+
+## Version Control Compliance
+
+PromptNova implements a robust version control compliance system to maintain code quality and consistency:
+
+### Git Hooks (`/.husky/pre-commit`)
+
+- Enforces code quality checks before commits
+- Runs linting and formatting on staged files
+- Validates commit messages against conventional commit format
+
+### Lint-Staged Configuration (`/lint-staged.config.js`)
+
+- Configures which linting and formatting tasks run on staged files
+- Ensures consistent code style across the codebase
+- Prevents code style issues from being committed
+
+### CI/CD Pipeline (`/.github/workflows/main.yml`)
+
+- Automates testing and validation on pull requests and pushes
+- Enforces commit message conventions
+- Runs linting, type checking, and tests in a controlled environment
+- Ensures code quality across all contributions
 
 ## Plugin System Infrastructure
 
@@ -472,7 +627,7 @@ workspaceContext.addEventListener(WorkspaceEvent.WORKSPACE_CHANGED, (workspace) 
 });
 ```
 
-### WorkspaceManager Component
+## WorkspaceManager Component
 
 Manages workspace creation, deletion, and organization.
 
@@ -506,7 +661,7 @@ workspaceManager.deleteWorkspace(workspaceId);
 const templates = workspaceManager.getTemplates();
 ```
 
-### WorkspaceSelector Component
+## WorkspaceSelector Component
 
 Provides a user interface for selecting and switching between workspaces.
 
@@ -536,7 +691,7 @@ import { WorkspaceSelector } from '@/renderer/components/workspace/WorkspaceSele
 />
 ```
 
-### WorkspaceSettings Component
+## WorkspaceSettings Component
 
 Manages workspace-specific configuration and settings.
 
@@ -566,7 +721,7 @@ import { WorkspaceSettings } from '@/renderer/components/workspace/WorkspaceSett
 />
 ```
 
-### useWorkspace Hook
+## useWorkspace Hook
 
 Custom React hook for managing workspace state and operations.
 
@@ -586,7 +741,7 @@ Custom React hook for managing workspace state and operations.
 
 **Usage**:
 
-```typescript
+````typescript
 import { useWorkspace } from '@/renderer/hooks/useWorkspace';
 
 const {
@@ -607,9 +762,10 @@ await updateWorkspace({
 // Export workspace data
 const exportData = await exportWorkspace();
 ```
-```
 
-### Enhanced SectionProvider
+````
+
+## Enhanced SectionProvider
 
 Provides context-aware section management with workspace integration.
 
@@ -639,7 +795,7 @@ switchSection('documentation', { preserveWorkspaceState: true });
 const workspaceSections = sections.filter(s => s.workspaceId === currentWorkspaceId);
 ```
 
-### Updated SettingsPanel
+## Updated SettingsPanel
 
 Provides workspace-specific settings management.
 
@@ -673,38 +829,6 @@ updateSettings({
 exportWorkspace(currentWorkspaceId, exportPath);
 ```
 
-### Workspace Model
-
-Organizes collections of prompts with workspace-level management.
-
-**Purpose**: Provides a container for organizing prompts with workspace-specific metadata and operations.
-
-**Features**:
-
-- Workspace configuration with settings like theme and font size
-- Workspace state persistence (section visibility, scroll position)
-- Event-driven updates for real-time synchronization
-- IPC communication for main and renderer process coordination
-
-**Usage**:
-
-```typescript
-// Create a workspace context provider
-const workspaceProvider = new WorkspaceContextProvider();
-
-// Update workspace configuration
-workspaceProvider.updateWorkspaceConfig({
-  name: "Updated Workspace",
-  settings: { theme: "dark" }
-});
-
-// Access workspace state
-const workspace = await workspaceProvider.getCurrentWorkspace();
-console.log(workspace.state.visibleSections);
-```
-
-```
-
 ## UI Component System
 
 PromptNova implements a modern UI component system for creating an intuitive and efficient user interface:
@@ -716,12 +840,14 @@ Provides a flexible, movable interface container that can be positioned anywhere
 **Purpose**: Creates a foundation for floating windows that can be resized, moved, and remembered between sessions.
 
 **Features**:
+
 - Size constraints with minimum and maximum dimensions
 - Position memory for restoring window placement
 - Performance optimizations for smooth animations
 - Drag handles for user repositioning
 
 **Files**:
+
 - `/src/components/layout/FloatingPanel.jsx`: Main component implementation
 
 **Usage**:
@@ -740,19 +866,21 @@ import { FloatingPanel } from '@/components/layout/FloatingPanel';
 </FloatingPanel>
 ```
 
-### WindowManager Integration
+## WindowManager Integration
 
 Integrates with Electron to provide native window management capabilities.
 
 **Purpose**: Bridges the gap between React components and Electron's window management, enabling advanced window behaviors.
 
 **Features**:
+
 - Complete Electron integration for native window controls
 - Stay-on-top functionality for floating windows
 - Window state management (position, size, visibility)
 - Multi-window coordination
 
 **Files**:
+
 - `/src/components/layout/WindowManager.jsx`: Electron integration layer
 - `/src/main/managers/WindowManager.ts`: Main process window management
 
@@ -784,13 +912,14 @@ const floatingWindow = windowManager.createFloatingWindow();
 windowManager.setWindowAlwaysOnTop(floatingWindow, true);
 ```
 
-### SearchBar Component
+## SearchBar Component
 
 Provides an advanced search interface with real-time filtering and result display.
 
 **Purpose**: Enables users to efficiently search and filter prompts with a modern, responsive interface that supports advanced filtering capabilities.
 
 **Features**:
+
 - Real-time search with debouncing
 - Advanced filtering by categories and tags
 - Dynamic result display with prompt details
@@ -800,10 +929,12 @@ Provides an advanced search interface with real-time filtering and result displa
 - Filter state management
 
 **Files**:
+
 - `/src/components/ui/SearchBar.tsx`: Main component implementation
 - `/src/shared/services/SearchService.ts`: Search service implementation
 
 **Implementation Details**:
+
 - Uses React hooks for state management
 - Implements TypeScript interfaces for type safety
 - Integrates with SearchService for data operations
@@ -829,13 +960,14 @@ const handlePromptSelect = (prompt) => {
 };
 ```
 
-### SearchService Integration
+## SearchService Integration
 
 Provides the backend functionality for the SearchBar component.
 
 **Purpose**: Manages prompt data retrieval, filtering, and real-time search operations.
 
 **Features**:
+
 - Asynchronous initialization
 - Debounced search operations
 - Category and tag filtering
@@ -843,11 +975,11 @@ Provides the backend functionality for the SearchBar component.
 - Error handling
 
 **Implementation Details**:
+
 - Maintains an in-memory cache of prompts
 - Uses IPC communication for data retrieval
 - Implements efficient filtering algorithms
 - Provides utility methods for metadata
-```
 
 ## Code Processing System
 
@@ -860,6 +992,7 @@ Provides utilities for processing and transforming code in different programming
 **Purpose**: Enables standardized code manipulation across the application, including comment stripping, whitespace handling, and empty line removal.
 
 **Features**:
+
 - Language-specific processing rules
 - Comment stripping with documentation preservation options
 - Whitespace normalization
@@ -867,6 +1000,7 @@ Provides utilities for processing and transforming code in different programming
 - Extensible design for additional languages
 
 **Files**:
+
 - `/src/shared/CodeProcessor.ts`: Main implementation
 - `/src/shared/models/SupportedLanguage.ts`: Supported language definitions
 
@@ -896,13 +1030,14 @@ const cleanCode = CodeProcessor.process(
 );
 ```
 
-### CodeCleaner Component
+## CodeCleaner Component
 
 Provides specialized empty line management and code formatting capabilities.
 
 **Purpose**: Offers fine-grained control over empty line handling in code, with preservation rules for maintaining code readability while reducing unnecessary whitespace.
 
 **Features**:
+
 - Empty line removal with configurable preservation rules
 - Intelligent spacing preservation around documentation, functions, and classes
 - Configurable consecutive empty line limits
@@ -910,6 +1045,7 @@ Provides specialized empty line management and code formatting capabilities.
 - Language-specific pattern recognition
 
 **Files**:
+
 - `/src/shared/CodeCleaner.ts`: Main implementation
 - `/src/shared/models/SupportedLanguage.ts`: Shared language definitions
 
@@ -946,13 +1082,14 @@ const batchResults = CodeCleaner.batchClean([
 ]);
 ```
 
-### Plugin Interface
+## Plugin Interface
 
 Defines the contract for plugin development.
 
 **Purpose**: Provides a standardized interface that all plugins must implement to ensure compatibility.
 
 **Features**:
+
 - Type definitions for plugin metadata
 - Required methods for lifecycle hooks
 - Event handling interfaces
@@ -979,7 +1116,7 @@ class MyPlugin implements PluginInterface {
 }
 ```
 
-### Plugin Store UI
+## Plugin Store UI
 
 Provides user interface components for managing plugins.
 
@@ -1036,7 +1173,7 @@ floatingPanel.show();
 floatingPanel.hide();
 ```
 
-### SearchBar
+## SearchBar
 
 Provides real-time search functionality across prompts and workspaces.
 
@@ -1064,7 +1201,7 @@ searchBar.search("my prompt").then(results => {
 });
 ```
 
-### CodePreview
+## CodePreview
 
 Displays code snippets and context with syntax highlighting.
 
@@ -1101,6 +1238,7 @@ Provides an interface for creating and editing prompts with real-time preview.
 **Purpose**: Enables users to create, edit, and format prompts with support for placeholders, markdown, and code snippets.
 
 **Features**:
+
 - Rich text editing with markdown support
 - Placeholder detection and management
 - Real-time preview of formatted content
@@ -1108,6 +1246,7 @@ Provides an interface for creating and editing prompts with real-time preview.
 - Validation and error handling
 
 **Files**:
+
 - `/src/renderer/components/prompt/PromptEditor.tsx`: Main component implementation
 
 **Usage**:
@@ -1116,7 +1255,7 @@ Provides an interface for creating and editing prompts with real-time preview.
 import { PromptEditor } from '@/renderer/components/prompt/PromptEditor';
 
 // Create a new prompt
-<PromptEditor 
+<PromptEditor
   onSave={(promptData) => savePrompt(promptData)}
   initialData={{
     title: "",
@@ -1127,19 +1266,20 @@ import { PromptEditor } from '@/renderer/components/prompt/PromptEditor';
 />
 
 // Edit an existing prompt
-<PromptEditor 
+<PromptEditor
   onSave={(promptData) => updatePrompt(promptId, promptData)}
   initialData={existingPrompt}
 />
 ```
 
-### PromptCategories Component
+## PromptCategories Component
 
 Manages the organization of prompts into categories for better organization.
 
 **Purpose**: Provides an interface for creating, editing, and managing prompt categories to organize the prompt library.
 
 **Features**:
+
 - Category creation and editing
 - Drag-and-drop organization
 - Nested category support
@@ -1147,6 +1287,7 @@ Manages the organization of prompts into categories for better organization.
 - Prompt assignment to categories
 
 **Files**:
+
 - `/src/renderer/components/prompt/PromptCategories.tsx`: Main component implementation
 
 **Usage**:
@@ -1162,13 +1303,14 @@ import { PromptCategories } from '@/renderer/components/prompt/PromptCategories'
 />
 ```
 
-### usePrompts Hook
+## usePrompts Hook
 
 Provides a centralized way to manage prompts throughout the application.
 
 **Purpose**: Offers a React hook for accessing and manipulating prompts with built-in state management and persistence.
 
 **Features**:
+
 - CRUD operations for prompts
 - Filtering and searching
 - Category-based organization
@@ -1176,6 +1318,7 @@ Provides a centralized way to manage prompts throughout the application.
 - Real-time updates across components
 
 **Files**:
+
 - `/src/renderer/hooks/usePrompts.ts`: Hook implementation
 
 **Usage**:
@@ -1184,7 +1327,7 @@ Provides a centralized way to manage prompts throughout the application.
 import { usePrompts } from '@/renderer/hooks/usePrompts';
 
 // In a component
-const { 
+const {
   prompts,
   getPromptById,
   createPrompt,
